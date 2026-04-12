@@ -10,11 +10,13 @@ import {
   Send,
   CheckCircle2,
   Circle,
+  Trash2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
+import { format } from "date-fns";
 
 interface Props {
   client: Client;
@@ -22,7 +24,7 @@ interface Props {
 }
 
 const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
-  const { addNote, moveClientToStage } = useCRM();
+  const { moveClientToStage, updateClient } = useCRM();
   const [noteText, setNoteText] = useState("");
   const [followUpDate, setFollowUpDate] = useState("");
   const [followUpNote, setFollowUpNote] = useState("");
@@ -32,8 +34,20 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
 
   const handleAddNote = () => {
     if (!noteText.trim()) return;
-    addNote(client.id!, noteText);
+    // addNote(client.id!, noteText);
+    updateClient(client?.id!, {
+      notes: [
+        ...client.notes,
+        { text: noteText, createdAt: new Date(Date.now()) },
+      ],
+    });
     setNoteText("");
+  };
+
+  const handleDeleteNote = (note: any) => {
+    updateClient(client?.id!, {
+      notes: client.notes.filter((n) => n.text !== note.text),
+    });
   };
 
   // const handleAddFollowUp = () => {
@@ -218,14 +232,32 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
                 </Button>
                 <div className="space-y-2 mt-4">
                   {/* {client.notes.map((note) => ( */}
-                  <div className="p-3 rounded-lg bg-secondary/50">
-                    <p className="text-sm text-foreground">{client.note}</p>
+                  <div className="gap-2">
+                    {client.notes.map((note) => (
+                      <div
+                        key={note.createdAt.toString()}
+                        className="my-2 bg-secondary/50 rounded-lg p-3 relative"
+                      >
+                        <p className="text-sm text-foreground">{note.text}</p>
+                        <span className="text-xs text-gray-500">
+                          {format(new Date(note.createdAt), "do MMM yyyy")}
+                        </span>
+
+                        <Button
+                          variant={"ghost"}
+                          className="absolute right-2 top-2"
+                          onClick={() => handleDeleteNote(note)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                     {/* <p className="text-[10px] text-muted-foreground mt-1 italic">
                         {formatTimeAgo(note.createdAt)}
                       </p> */}
                   </div>
                   {/* ))} */}
-                  {!client.note && (
+                  {client.notes.length === 0 && (
                     <p className="text-sm text-muted-foreground text-center py-4">
                       No notes yet.
                     </p>

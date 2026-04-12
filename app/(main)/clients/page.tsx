@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
 
 const Clients: React.FC = () => {
   const { deleteClient, searchQuery, setSearchQuery } = useCRM();
@@ -65,7 +66,7 @@ const Clients: React.FC = () => {
       c.location,
       c.visit,
       c.followUp,
-      c.note,
+      c.notes,
       c.stage,
     ]);
     const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
@@ -157,7 +158,7 @@ const Clients: React.FC = () => {
                   Stage
                 </th>
                 <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden xl:table-cell">
-                  Last Contact
+                  Visit
                 </th>
                 <th className="text-right py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   Actions
@@ -181,7 +182,7 @@ const Clients: React.FC = () => {
                   <td className="py-3 px-4 font-mono tabular-nums text-foreground/80">
                     {formatCurrency(client.budget!)}
                   </td>
-                  <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell text-xs">
+                  <td className="py-3 px-4 text-muted-foreground hidden lg:table-cell text-sm">
                     {client.interestedProperty}
                   </td>
                   <td className="py-3 px-4 hidden sm:table-cell">
@@ -192,9 +193,11 @@ const Clients: React.FC = () => {
                       }
                     </span>
                   </td>
-                  {/* <td className="py-3 px-4 text-muted-foreground text-xs hidden xl:table-cell italic">
-                    {formatTimeAgo(client.lastContact)}
-                  </td> */}
+                  <td className="py-3 px-4 text-muted-foreground text-xs hidden xl:table-cell">
+                    {client.visit
+                      ? format(new Date(client.visit!), "do MMM yyyy")
+                      : ""}
+                  </td>
                   <td className="py-3 px-4 text-right">
                     <div
                       className="flex justify-end gap-1"

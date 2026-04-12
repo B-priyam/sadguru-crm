@@ -13,7 +13,7 @@ datasource db {
 }
 
 model Client {
-  id                 String     @id @default(uuid())
+  id                 String    @id @default(uuid())
   name               String
   stage              String
   number             String
@@ -26,9 +26,9 @@ model Client {
   propertyType       String?
   budget             String?
   visit              DateTime?
-  note               String?
-  followUp           DateTime[]
-  createdAt          DateTime   @default(now())
+  notes              Json?
+  followUp           Json?
+  createdAt          DateTime  @default(now())
   updatedAt          DateTime?
 }
 
@@ -41,7 +41,7 @@ model Property {
 }
 
 model RecentlyDeleted {
-  id                 String     @id @default(uuid())
+  id                 String    @id @default(uuid())
   name               String
   stage              String
   number             String
@@ -54,7 +54,7 @@ model RecentlyDeleted {
   propertyType       String?
   budget             String?
   visit              DateTime?
-  note               String?
-  followUp           DateTime[]
-  createdAt          DateTime   @default(now())
+  notes              Json?
+  followUp           Json?
+  createdAt          DateTime  @default(now())
 }

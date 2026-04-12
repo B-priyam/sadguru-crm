@@ -60,6 +60,7 @@ export const UNIT_TYPES: { value: UnitType; label: string }[] = [
 export interface PropertyUnit {
   type: string;
   price: string;
+  area: string;
 }
 
 export interface Property {
@@ -70,9 +71,8 @@ export interface Property {
 }
 
 export interface ClientNote {
-  id: string;
   text: string;
-  createdAt: string;
+  createdAt: Date;
 }
 
 export interface Booking {
@@ -100,7 +100,7 @@ export interface Client {
   // selectedUnit?: string;
   propertyType?: string;
   // leadSource: LeadSource;
-  note?: string;
+  notes: ClientNote[];
   // dateAdded: string;
   stage: PipelineStage;
   // lastContact: string;

@@ -6,22 +6,7 @@ import { client } from "@/prisma/client";
 export const createClient = async (clientData: Client) => {
   try {
     const create = await client.client.create({
-      data: {
-        id: clientData.id,
-        name: clientData.name,
-        number: clientData.number,
-        stage: clientData.stage || "new_lead",
-        budget: clientData.budget,
-        income: clientData.income,
-        interestedProperty: clientData.interestedProperty,
-        propertyType: clientData.propertyType,
-        location: clientData.location,
-        occupation: clientData.occupation,
-        residence: clientData.residence,
-        visit: clientData.visit,
-        followUp: clientData.followUp,
-        note: clientData.note,
-      },
+      data: clientData as any,
     });
 
     if (create) {
@@ -93,7 +78,7 @@ export const EditClientAction = async (
       where: {
         id: clientId,
       },
-      data: clientData,
+      data: clientData as any,
     });
 
     if (edit) {
@@ -112,7 +97,7 @@ export const EditClientAction = async (
 
 export const updateClientStage = async (id: string, stage: PipelineStage) => {
   try {
-    if (!id || stage) return;
+    if (!id || !stage) return;
 
     const updatedData = await client.client.update({
       where: {

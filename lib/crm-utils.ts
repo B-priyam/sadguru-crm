@@ -1,7 +1,7 @@
 import { useCRM } from "@/context/CRMContext";
 
 export function formatCurrency(amount: string): string {
-  console.log(amount);
+  // console.log(amount);
   const amt = Number(amount);
   if (amt >= 10000000) return `₹${(amt / 10000000).toFixed(1)}Cr`;
   if (amt >= 100000) return `₹${(amt / 100000).toFixed(1)}L`;

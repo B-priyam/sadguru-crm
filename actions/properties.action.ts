@@ -4,7 +4,6 @@ import { Property } from "@/types/crm";
 import { client } from "@/prisma/client";
 
 export const addPropertyAction = async (propertyDetails: Property) => {
-  console.log("🔴", propertyDetails.units);
   try {
     const create = await client.property.create({
       data: propertyDetails as any,

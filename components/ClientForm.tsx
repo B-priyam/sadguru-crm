@@ -33,24 +33,24 @@ interface Props {
   onClose: () => void;
 }
 
-const propertyTypes: { value: PropertyType; label: string }[] = [
-  { value: "1bhk", label: "1 BHK" },
-  { value: "2bhk", label: "2 BHK" },
-  { value: "3bhk", label: "3 BHK" },
-  { value: "4bhk", label: "4 BHK" },
-  { value: "villa", label: "Villa" },
-  { value: "plot", label: "Plot" },
-  { value: "commercial", label: "Commercial" },
-];
+// const propertyTypes: { value: PropertyType; label: string }[] = [
+//   { value: "1bhk", label: "1 BHK" },
+//   { value: "2bhk", label: "2 BHK" },
+//   { value: "3bhk", label: "3 BHK" },
+//   { value: "4bhk", label: "4 BHK" },
+//   { value: "villa", label: "Villa" },
+//   { value: "plot", label: "Plot" },
+//   { value: "commercial", label: "Commercial" },
+// ];
 
-const leadSources: { value: LeadSource; label: string }[] = [
-  { value: "referral", label: "Referral" },
-  { value: "website", label: "Website" },
-  { value: "social_media", label: "Social Media" },
-  { value: "walk_in", label: "Walk-in" },
-  { value: "portal", label: "Portal" },
-  { value: "other", label: "Other" },
-];
+// const leadSources: { value: LeadSource; label: string }[] = [
+//   { value: "referral", label: "Referral" },
+//   { value: "website", label: "Website" },
+//   { value: "social_media", label: "Social Media" },
+//   { value: "walk_in", label: "Walk-in" },
+//   { value: "portal", label: "Portal" },
+//   { value: "other", label: "Other" },
+// ];
 
 const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const { clients, addClient, updateClient, properties, addProperty } =
@@ -60,10 +60,10 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const [name, setName] = useState(existing?.name || "");
   const [number, setNumber] = useState(existing?.number || "");
   const [budget, setBudget] = useState(existing?.budget || "");
-  const [location, setLocation] = useState("");
-  const [income, setIncome] = useState("");
-  const [occupation, setOccupation] = useState("Job");
-  const [residentialType, setResidentialType] = useState("Owner");
+  const [location, setLocation] = useState(existing?.location || "");
+  const [income, setIncome] = useState(existing?.income || "");
+  const [occupation, setOccupation] = useState(existing?.occupation || "Job");
+  const [residence, setResidence] = useState(existing?.residence || "Owner");
   const [selectedPropertyId, setSelectedPropertyId] = useState<string>(() => {
     if (existing?.interestedProperty) {
       const found = properties.find(
@@ -91,7 +91,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const [visitTime, setVisitTime] = useState(
     existing?.visit ? format(new Date(existing.visit), "HH:mm") : "10:00",
   );
-  const [notes, setNotes] = useState("");
+  const [note, setNote] = useState(existing?.notes[0].text || "");
   const [showAddProperty, setShowAddProperty] = useState(false);
   const [newPropertyName, setNewPropertyName] = useState("");
 
@@ -129,6 +129,9 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         // leadSource,
         stage,
         visit: visitDateISO,
+        // notes: [...existing.notes,note],
+        income,
+        residence,
       });
     } else {
       addClient({
@@ -142,10 +145,11 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         // leadSource,
         stage,
         visit: visitDateISO,
-        income: "",
-        location: "",
-        occupation: "",
-        residence: "",
+        income,
+        location,
+        occupation,
+        residence,
+        notes: note ? [{ text: note, createdAt: new Date(Date.now()) }] : [],
       });
     }
     onClose();
@@ -280,9 +284,9 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 Residential Type
               </label>
               <Select
-                value={residentialType}
+                value={residence}
                 onValueChange={(v) => {
-                  setResidentialType(v);
+                  setResidence(v);
                 }}
               >
                 <SelectTrigger className="min-h-9 mt-1 text-sm flex-1 min-w-full">
@@ -531,19 +535,19 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
             </div>
           </div>
 
-          {!existing && (
-            <div>
-              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                Initial Notes
-              </label>
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="text-sm mt-1 min-h-[60px]"
-                placeholder="Enter some note to remember..."
-              />
-            </div>
-          )}
+          {/* {!existing && ( */}
+          <div>
+            <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
+              Initial Notes
+            </label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="text-sm mt-1 min-h-[60px]"
+              placeholder="Enter some note to remember..."
+            />
+          </div>
+          {/* )} */}
 
           <div className="flex gap-2 pt-2">
             <Button

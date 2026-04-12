@@ -39,17 +39,12 @@ import { toast } from "sonner";
 
 interface CRMContextType {
   clients: Client[];
-  addClient: (
-    client: Omit<
-      Client,
-      "id" | "dateAdded" | "lastContact" | "notes" | "activities" | "followUps"
-    >,
-  ) => void;
+  addClient: (client: Client) => void;
   updateClient: (id: string, updates: Partial<Client>) => void;
   deleteClient: (id: string) => void;
   moveClientToStage: (id: string, stage: PipelineStage) => void;
   addBooking: (clientId: string, booking: Booking) => void;
-  addNote: (clientId: string, text: string) => void;
+  // addNote: (clientId: string, text: string) => void;
   // addFollowUp: (clientId: string, followUp: Omit<FollowUp, "id">) => void;
   // toggleFollowUp: (clientId: string, followUpId: string) => void;
   searchQuery: string;
@@ -126,7 +121,6 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const getAllProperties = async () => {
     const allProperties = await GetPropertiesAction();
     if (allProperties?.success) {
-      console.log(allProperties);
       setProperties(allProperties.data as unknown as Property[]);
     } else {
       console.log("no data found");
@@ -166,6 +160,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
     async (id: string, updates: Partial<Client>) => {
       const clientPrevData = clients.filter((client) => client.id === id)[0];
 
+      console.log(updates);
       setClients((prev) => {
         return prev.map((c) => (c.id === id ? { ...c, ...updates } : c));
       });
@@ -247,17 +242,18 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   }, []);
 
-  const addNote = useCallback((clientId: string, text: string) => {
-    setClients((prev) =>
-      prev.map((c) => {
-        if (c.id !== clientId) return c;
-        return {
-          ...c,
-          notes: c.note,
-        };
-      }),
-    );
-  }, []);
+  // const addNote = useCallback((clientId: string, text: string) => {
+  //   setClients((prev) =>
+  //     prev.map((c) => {
+  //       if (c.id !== clientId) return c;
+  //       return {
+  //         ...c,
+  //         notes: c.note,
+  //       };
+  //     }),
+
+  //   );
+  // }, []);
 
   const addFollowUp = useCallback(
     (clientId: string, followUp: Omit<Date, "id">) => {
@@ -351,7 +347,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteClient,
         moveClientToStage,
         addBooking,
-        addNote,
+        // addNote,
         // addFollowUp,
         // toggleFollowUp,
         searchQuery,

@@ -31,7 +31,9 @@ const Properties: React.FC = () => {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   // const [status, setStatus] = useState<Property["status"]>("available");
-  const [units, setUnits] = useState<{ type: UnitType; price: string }[]>([]);
+  const [units, setUnits] = useState<
+    { type: UnitType; price: string; area: string }[]
+  >([]);
 
   const resetForm = () => {
     setName("");
@@ -47,7 +49,11 @@ const Properties: React.FC = () => {
     setLocation(p.location);
     // setStatus(p.status);
     setUnits(
-      p.units.map((u) => ({ type: u.type as UnitType, price: u.price })),
+      p.units.map((u) => ({
+        type: u.type as UnitType,
+        price: u.price,
+        area: u.area,
+      })),
     );
     setEditingId(p.id!);
     setShowForm(true);
@@ -57,7 +63,10 @@ const Properties: React.FC = () => {
     const usedTypes = units.map((u) => u.type);
     const nextType = UNIT_TYPES.find((t) => !usedTypes.includes(t.value));
     if (nextType) {
-      setUnits((prev) => [...prev, { type: nextType.value, price: "" }]);
+      setUnits((prev) => [
+        ...prev,
+        { type: nextType.value, price: "", area: "" },
+      ]);
     }
   };
 
@@ -67,7 +76,7 @@ const Properties: React.FC = () => {
 
   const updateUnit = (
     index: number,
-    field: "type" | "price",
+    field: "type" | "price" | "area",
     value: string,
   ) => {
     setUnits((prev) =>
@@ -83,7 +92,8 @@ const Properties: React.FC = () => {
       .filter((u) => u.price)
       .map((u) => ({
         type: u.type,
-        price: u.price || "0",
+        price: u.price,
+        area: u.area,
       }));
 
     const data = { name, location, units: propertyUnits };
@@ -207,7 +217,7 @@ const Properties: React.FC = () => {
                       size="sm"
                       className="h-7 text-xs gap-1"
                       onClick={addUnit}
-                      disabled={units.length >= UNIT_TYPES.length}
+                      // disabled={units.length >= UNIT_TYPES.length}
                     >
                       <Plus size={12} /> Add Unit
                     </Button>
@@ -238,9 +248,9 @@ const Properties: React.FC = () => {
                               <SelectItem
                                 key={t.value}
                                 value={t.value}
-                                disabled={units.some(
-                                  (u, i) => i !== index && u.type === t.value,
-                                )}
+                                // disabled={units.some(
+                                //   (u, i) => i !== index && u.type === t.value,
+                                // )}
                                 className="text-xs"
                               >
                                 {t.label}
@@ -248,8 +258,23 @@ const Properties: React.FC = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                        <div className="flex-1 relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                        <div className="md:flex-1 md:relative ">
+                          <Input
+                            type="text"
+                            value={unit.area}
+                            onChange={(e) =>
+                              updateUnit(index, "area", e.target.value)
+                            }
+                            className="h-8 text-xs pl-2 md:pl-6"
+                            placeholder="Area"
+                          />
+                          <span className="hidden md:absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                            {" "}
+                            Sq.ft
+                          </span>
+                        </div>
+                        <div className="md:flex-1 md:relative">
+                          <span className="hidden md:absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
                             ₹
                           </span>
                           <Input
@@ -265,7 +290,7 @@ const Properties: React.FC = () => {
                                 updateUnit(index, "price", formatted);
                               }
                             }}
-                            className="h-8 text-xs pl-6"
+                            className="h-8 text-xs pl-1 md:pl-6 "
                             placeholder="Price"
                           />
                         </div>
@@ -338,7 +363,7 @@ const Properties: React.FC = () => {
                 <div className="space-y-1">
                   {p.units.map((u) => (
                     <div
-                      key={u.type}
+                      key={u.price}
                       className="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-secondary/50"
                     >
                       <Badge
@@ -347,6 +372,9 @@ const Properties: React.FC = () => {
                       >
                         {u.type.toUpperCase()}
                       </Badge>
+                      <span className="text-xs font-mono font-medium text-foreground tabular-nums">
+                        {u.area ? `${u.area} Sq.ft` : ""}
+                      </span>
                       <span className="text-xs font-mono font-medium text-foreground tabular-nums">
                         {formatCurrency(u.price)}
                       </span>

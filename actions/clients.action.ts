@@ -37,6 +37,7 @@ export const GetClients = async () => {
       };
     }
   } catch (error) {
+    console.log("🔴🔴", error);
     return {
       success: false,
       status: 500,

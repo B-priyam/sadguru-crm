@@ -77,8 +77,12 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     existing?.propertyType || "",
   );
   const [propertyType, setPropertyType] = useState<string>(
-    existing?.propertyType || "1bhk",
+    existing?.propertyType || "",
   );
+  const [propertyArea, setPropertyArea] = useState<string>(
+    existing?.propertyArea || "",
+  );
+
   // const [leadSource, setLeadSource] = useState<LeadSource>(
   //   existing?.leadSource || "website",
   // );
@@ -91,7 +95,9 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const [visitTime, setVisitTime] = useState(
     existing?.visit ? format(new Date(existing.visit), "HH:mm") : "10:00",
   );
-  const [note, setNote] = useState(existing?.notes[0].text || "");
+  const [note, setNote] = useState(
+    existing?.notes?.length! > 0 ? existing?.notes[0].text : "",
+  );
   const [showAddProperty, setShowAddProperty] = useState(false);
   const [newPropertyName, setNewPropertyName] = useState("");
 
@@ -132,6 +138,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         // notes: [...existing.notes,note],
         income,
         residence,
+        propertyArea,
       });
     } else {
       addClient({
@@ -149,6 +156,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         location,
         occupation,
         residence,
+        propertyArea,
         notes: note ? [{ text: note, createdAt: new Date(Date.now()) }] : [],
       });
     }
@@ -413,17 +421,25 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 <div className="flex flex-wrap gap-2 mt-1.5">
                   {selectedProperty.units.map((unit) => (
                     <button
-                      key={unit.type}
+                      key={unit.price}
                       type="button"
-                      onClick={() => setPropertyType(unit.type)}
+                      onClick={() => {
+                        setPropertyType(unit.type);
+                        setPropertyArea(unit.area);
+                      }}
                       className={`text-xs font-medium px-3 py-2 rounded-lg transition-all border flex flex-col items-center gap-0.5 min-w-[80px] ${
-                        propertyType === unit.type
+                        propertyArea === unit.area
                           ? "bg-primary text-primary-foreground border-primary"
                           : "bg-secondary text-muted-foreground border-border hover:bg-secondary/80"
                       }`}
                     >
                       <span className="font-semibold">
                         {unit.type.toUpperCase()}
+                      </span>
+                      <span
+                        className={`text-[10px] font-mono ${propertyArea === unit.area ? "text-primary-foreground/80" : "text-muted-foreground"}`}
+                      >
+                        {unit.area}
                       </span>
                       <span
                         className={`text-[10px] font-mono ${propertyType === unit.type ? "text-primary-foreground/80" : "text-muted-foreground"}`}

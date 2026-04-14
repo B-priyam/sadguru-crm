@@ -24,6 +24,7 @@ model Client {
   location           String?
   interestedProperty String?
   propertyType       String?
+  propertyArea       String?
   budget             String?
   visit              DateTime?
   notes              Json?

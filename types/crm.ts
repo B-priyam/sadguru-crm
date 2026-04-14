@@ -99,6 +99,7 @@ export interface Client {
   interestedProperty?: string;
   // selectedUnit?: string;
   propertyType?: string;
+  propertyArea?: string;
   // leadSource: LeadSource;
   notes: ClientNote[];
   // dateAdded: string;

@@ -79,16 +79,16 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-card card-shadow z-30 flex justify-around items-center py-2 px-1">
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-card card-shadow z-30 flex  items-center py-2 px-1">
         {navItems.map((item) => {
           const isActive = pathname === item.to;
           return (
             <Link
               key={item.to}
               href={item.to}
-              className={`flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] transition-colors ${
+              className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg text-[10px] transition-colors ${
                 isActive ? "text-primary font-medium" : "text-muted-foreground"
-              }`}
+              } ${item.label === "Pipeline" && "hidden"}`}
             >
               <item.icon size={18} strokeWidth={1.5} />
               {item.label}

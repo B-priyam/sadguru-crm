@@ -56,10 +56,17 @@ export const deleteClientAction = async (clientId: string) => {
     });
 
     if (data) {
-      return {
-        success: true,
-        status: 200,
-      };
+      const { updatedAt, ...otherData } = data;
+      const addClientToDeletedClientData = await client.recentlyDeleted.create({
+        data: otherData as any,
+      });
+
+      if (addClientToDeletedClientData) {
+        return {
+          success: true,
+          status: 200,
+        };
+      }
     }
   } catch (error) {
     console.log(error);

@@ -158,6 +158,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         residence,
         propertyArea,
         notes: note ? [{ text: note, createdAt: new Date(Date.now()) }] : [],
+        followUp: [],
       });
     }
     onClose();
@@ -546,7 +547,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 type="time"
                 value={visitTime}
                 onChange={(e) => setVisitTime(e.target.value)}
-                className="h-9 text-sm mt-1"
+                className="h-9 text-sm mt-1 dark:scheme-dark"
               />
             </div>
           </div>

@@ -46,7 +46,7 @@ interface CRMContextType {
   addBooking: (clientId: string, booking: Booking) => void;
   // addNote: (clientId: string, text: string) => void;
   // addFollowUp: (clientId: string, followUp: Omit<FollowUp, "id">) => void;
-  // toggleFollowUp: (clientId: string, followUpId: string) => void;
+  // toggleFollowUp: (clientId: string, follow: FollowUp) => void;
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   properties: Property[];
@@ -160,7 +160,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
     async (id: string, updates: Partial<Client>) => {
       const clientPrevData = clients.filter((client) => client.id === id)[0];
 
-      console.log(updates);
+      // console.log(updates);
       setClients((prev) => {
         return prev.map((c) => (c.id === id ? { ...c, ...updates } : c));
       });
@@ -255,34 +255,20 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   //   );
   // }, []);
 
-  const addFollowUp = useCallback(
-    (clientId: string, followUp: Omit<Date, "id">) => {
-      setClients((prev) =>
-        prev.map((c) => {
-          if (c.id !== clientId) return c;
-          return {
-            ...c,
-            followUps: [followUp, ...c.followUp!],
-          };
-        }),
-      );
-    },
-    [],
-  );
-
-  // const toggleFollowUp = useCallback((clientId: string, followUpId: string) => {
-  //   setClients((prev) =>
-  //     prev.map((c) => {
-  //       if (c.id !== clientId) return c;
-  //       return {
-  //         ...c,
-  //         followUps: c.followUps.map((f) =>
-  //           f.id === followUpId ? { ...f, completed: !f } : f,
-  //         ),
-  //       };
-  //     }),
-  //   );
-  // }, []);
+  // const addFollowUp = useCallback(
+  //   (clientId: string, followUp: Omit<Date, "id">) => {
+  //     setClients((prev) =>
+  //       prev.map((c) => {
+  //         if (c.id !== clientId) return c;
+  //         return {
+  //           ...c,
+  //           followUps: [followUp, ...c.followUp!],
+  //         };
+  //       }),
+  //     );
+  //   },
+  //   [],
+  // );
 
   const addProperty = useCallback(async (property: Property) => {
     const tempId = await getRandomUUID();

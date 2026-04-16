@@ -16,6 +16,17 @@ import {
 } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // const statusOptions: { value: Property["status"]; label: string }[] = [
 //   { value: "available", label: "Available" },
@@ -34,6 +45,8 @@ const Properties: React.FC = () => {
   const [units, setUnits] = useState<
     { type: UnitType; price: string; area: string }[]
   >([]);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteId, setDeleteId] = useState("");
 
   const resetForm = () => {
     setName("");
@@ -403,7 +416,10 @@ const Properties: React.FC = () => {
                 variant="ghost"
                 size="sm"
                 className="flex-1 h-7 text-xs gap-1 text-destructive hover:text-destructive"
-                onClick={() => deleteProperty(p.id!)}
+                onClick={() => {
+                  setOpenDeleteDialog(true);
+                  setDeleteId(p.id!);
+                }}
               >
                 <Trash2 size={12} /> Delete
               </Button>
@@ -422,6 +438,31 @@ const Properties: React.FC = () => {
           </div>
         )}
       </div>
+      <AlertDialog
+        open={openDeleteDialog}
+        onOpenChange={() => setOpenDeleteDialog(!openDeleteDialog)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              property data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                deleteProperty(deleteId);
+                setOpenDeleteDialog(false);
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

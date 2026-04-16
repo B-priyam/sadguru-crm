@@ -85,9 +85,9 @@ export interface Booking {
 
 export interface FollowUp {
   id: string;
-  date: string;
+  date: Date;
   note: string;
-  completed: boolean;
+  completed?: boolean;
 }
 
 export interface Client {
@@ -107,7 +107,7 @@ export interface Client {
   // lastContact: string;
   visit?: string;
   // booking?: Booking;
-  followUp?: Date[];
+  followUp: FollowUp[];
   income?: string;
   location?: string;
   occupation?: string;

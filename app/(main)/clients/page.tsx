@@ -19,6 +19,17 @@ import { Button } from "@/components/ui/button";
 import ClientForm from "@/components/ClientForm";
 import ClientSlideOver from "@/components/ClientSlideOver";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -34,6 +45,8 @@ const Clients: React.FC = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [stageFilter, setStageFilter] = useState<string>("all");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [deleteId, SetdeleteId] = useState("");
 
   const displayClients = useMemo(() => {
     if (stageFilter === "all") return filteredClients;
@@ -213,7 +226,10 @@ const Clients: React.FC = () => {
                         <Pencil size={13} strokeWidth={1.5} />
                       </button>
                       <button
-                        onClick={() => deleteClient(client.id!)}
+                        onClick={() => {
+                          setOpenDeleteDialog(true);
+                          SetdeleteId(client.id!);
+                        }}
                         className="h-7 w-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                       >
                         <Trash2 size={13} strokeWidth={1.5} />
@@ -243,6 +259,32 @@ const Clients: React.FC = () => {
           onClose={() => setSelectedId(null)}
         />
       )}
+
+      <AlertDialog
+        open={openDeleteDialog}
+        onOpenChange={() => setOpenDeleteDialog(!openDeleteDialog)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete this
+              client data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                deleteClient(deleteId);
+                setOpenDeleteDialog(false);
+              }}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useCRM } from "@/context/CRMContext";
-import { Client, PIPELINE_STAGES } from "@/types/crm";
+import { Client, FollowUp, PIPELINE_STAGES } from "@/types/crm";
 import { formatCurrency, formatTimeAgo, getInitials } from "@/lib/crm-utils";
 import {
   X,
@@ -50,21 +50,55 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
     });
   };
 
-  // const handleAddFollowUp = () => {
-  //   if (!followUpDate || !followUpNote.trim()) return;
-  //   addFollowUp(client.id!, {
-  //     date: new Date(followUpDate).toISOString(),
-  //     note: followUpNote,
-  //     completed: false,
-  //   });
-  //   setFollowUpDate("");
-  //   setFollowUpNote("");
-  // };
+  const toggleFollowUp = useCallback((clientId: string, followUp: FollowUp) => {
+    // setClients((prev) =>
+    //   prev.map((c) => {
+    //     if (c.id !== clientId) return c;
+    //     return {
+    //       ...c,
+    //       followUp: c.followUp.map((f) =>
+    //         f.id === follow.id ? { ...f, completed: !f.completed } : f,
+    //       ),
+    //     };
+    //   }),
+    // );
+
+    updateClient(clientId, {
+      followUp: client.followUp.map((f) =>
+        f.id === followUp.id ? { ...f, completed: !f.completed } : f,
+      ),
+    });
+  }, []);
+
+  const handleAddFollowUp = () => {
+    if (!followUpDate || !followUpNote.trim()) return;
+
+    updateClient(client?.id!, {
+      followUp: [
+        ...client.followUp,
+        {
+          id: new Date().toISOString().toString(),
+          note: followUpNote,
+          date: new Date(Date.now()),
+          completed: false,
+        },
+      ],
+    });
+    setFollowUpNote("");
+    setFollowUpDate("");
+    // addFollowUp(client.id!, {
+    //   date: new Date(followUpDate).toISOString(),
+    //   note: followUpNote,
+    //   completed: false,
+    // });
+    // setFollowUpDate("");
+    // setFollowUpNote("");
+  };
 
   const tabs = [
     { id: "details" as const, label: "Details" },
     { id: "notes" as const, label: "Notes" },
-    { id: "activity" as const, label: "Activity" },
+    // { id: "activity" as const, label: "Activity" },
     { id: "followups" as const, label: "Follow-ups" },
   ];
 
@@ -128,6 +162,12 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
                     { label: "Budget", value: formatCurrency(client.budget!) },
                     { label: "Property", value: client.interestedProperty },
                     { label: "Type", value: client.propertyType },
+                    {
+                      label: "Visit",
+                      value: client.visit
+                        ? format(new Date(client.visit!), "do MMM yy")
+                        : "Not updated",
+                    },
                     // {
                     //   label: "Source",
                     //   value: client.leadSource.replace("_", " "),
@@ -302,7 +342,7 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
                     type="date"
                     value={followUpDate}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="h-9 text-sm"
+                    className="h-9 text-sm dark:[color-scheme:dark]"
                   />
                   <Input
                     value={followUpNote}
@@ -310,56 +350,53 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
                     placeholder="Follow-up note..."
                     className="h-9 text-sm"
                   />
-                  {/* <Button
+                  <Button
                     onClick={handleAddFollowUp}
                     size="sm"
                     className="gap-1.5 w-full"
                   >
                     <Calendar size={12} strokeWidth={1.5} /> Schedule
-                  </Button> */}
+                  </Button>
                 </div>
                 <div className="space-y-2 mt-4">
-                  {/* {client.followUps.map((f) => (
-                    <div
-                      key={f.id}
-                      onClick={() => toggleFollowUp(client.id, f.id)}
-                      className={`flex items-start gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
-                        f.completed ? "bg-primary/5" : "bg-secondary/50"
-                      }`}
-                    >
-                      {f.completed ? (
-                        <CheckCircle2
-                          size={16}
-                          className="text-primary mt-0.5 flex-shrink-0"
-                          strokeWidth={1.5}
-                        />
-                      ) : (
-                        <Circle
-                          size={16}
-                          className="text-muted-foreground mt-0.5 flex-shrink-0"
-                          strokeWidth={1.5}
-                        />
-                      )} */}
-                  <div>
-                    {/* <p
-                          className={`text-sm text-foreground`}
-                        >
-                          {client.followUp && new Date(client.followUp)}
-                        </p> */}
-                    {/* <p className="text-[10px] text-muted-foreground mt-0.5">
-                          <Clock size={10} className="inline mr-1" />
-                          {new Date(f.date).toLocaleDateString()}
-                        </p> */}
-                  </div>
+                  {client.followUp.length > 0 &&
+                    client?.followUp?.map((f) => (
+                      <div
+                        key={f.date.toString()}
+                        onClick={() => toggleFollowUp(client.id!, f)}
+                        className={`flex items-start gap-2 p-3 rounded-lg cursor-pointer transition-colors ${
+                          f.completed ? "bg-primary/5" : "bg-secondary/50"
+                        }`}
+                      >
+                        {f.completed ? (
+                          <CheckCircle2
+                            size={16}
+                            className="text-primary mt-0.5 flex-shrink-0"
+                            strokeWidth={1.5}
+                          />
+                        ) : (
+                          <Circle
+                            size={16}
+                            className="text-muted-foreground mt-0.5 flex-shrink-0"
+                            strokeWidth={1.5}
+                          />
+                        )}
+                        <div>
+                          <p className={`text-sm text-foreground`}>{f.note}</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">
+                            <Clock size={10} className="inline mr-1" />
+                            {new Date(f.date).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  {!client?.followUp.length && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No follow-ups scheduled.
+                    </p>
+                  )}
                 </div>
-                {/* ))} */}
-                {client.followUp && (
-                  <p className="text-sm text-muted-foreground text-center py-4">
-                    No follow-ups scheduled.
-                  </p>
-                )}
               </div>
-              // </div>
             )}
           </div>
         </motion.div>

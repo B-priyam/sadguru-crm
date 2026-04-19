@@ -224,13 +224,14 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 onChange={(e) => {
                   const value = e.target.value.replace(/,/g, "");
                   if (!/^\d*$/.test(value)) return;
-                  if (value.length > 10) return;
+                  if (value.length > 13) return;
 
                   setNumber(value);
                 }}
                 className="h-9 text-sm mt-1"
                 placeholder="1234567890"
                 required
+                min={10}
               />
             </div>
             <div>

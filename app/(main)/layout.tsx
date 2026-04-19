@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import {
   LayoutDashboard,
   Kanban,
@@ -16,6 +16,8 @@ import { useTheme } from "@/hooks/use-theme";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { syncPendingActions } from "@/actions/offline.action";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -30,6 +32,13 @@ const navItems = [
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
+  const isOnline = useOnlineStatus();
+
+  useEffect(() => {
+    if (isOnline) {
+      syncPendingActions();
+    }
+  }, [isOnline]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -86,7 +95,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Link
               key={item.to}
               href={item.to}
-              className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg text-[10px] transition-colors ${
+              className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg text-[10px] transition-colors justify-between w-full ${
                 isActive ? "text-primary font-medium" : "text-muted-foreground"
               } ${item.label === "Pipeline" && "hidden"}`}
             >

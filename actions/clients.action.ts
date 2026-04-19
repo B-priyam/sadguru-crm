@@ -2,19 +2,28 @@
 
 import { Client, PipelineStage, type Property } from "@/types/crm";
 import { client } from "@/prisma/client";
+// import { addPendingAction } from "./offline.action";
+// import { saveClients } from "./offline.action";
 
 export const createClient = async (clientData: Client) => {
   try {
-    const create = await client.client.create({
-      data: clientData as any,
-    });
+    if (navigator.onLine) {
+      const create = await client.client.create({
+        data: clientData as any,
+      });
 
-    if (create) {
-      return {
-        success: true,
-        status: 201,
-        data: create,
-      };
+      if (create) {
+        return {
+          success: true,
+          status: 201,
+          data: create,
+        };
+      }
+    } else {
+      // await addPendingAction({
+      //   method: "post",
+      //   data: clientData,
+      // });
     }
   } catch (error) {
     return {
@@ -48,25 +57,37 @@ export const GetClients = async () => {
 
 export const deleteClientAction = async (clientId: string) => {
   try {
-    if (!clientId) return;
-    const data = await client.client.delete({
-      where: {
-        id: clientId,
-      },
-    });
+    try {
+      if (!clientId) return;
 
-    if (data) {
-      const { updatedAt, ...otherData } = data;
-      const addClientToDeletedClientData = await client.recentlyDeleted.create({
-        data: otherData as any,
+      const result = await client.$transaction(async (tx) => {
+        const deletedClient = await tx.client.delete({
+          where: {
+            id: clientId,
+          },
+        });
+
+        const { updatedAt, ...otherData } = deletedClient;
+
+        const addedToRecentlyDeleted = await tx.recentlyDeleted.create({
+          data: otherData as any,
+        });
+
+        return addedToRecentlyDeleted;
       });
 
-      if (addClientToDeletedClientData) {
+      if (result) {
         return {
           success: true,
           status: 200,
         };
       }
+    } catch (error) {
+      console.error(error);
+      return {
+        success: false,
+        status: 500,
+      };
     }
   } catch (error) {
     console.log(error);

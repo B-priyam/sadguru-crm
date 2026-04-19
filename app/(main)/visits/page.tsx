@@ -180,7 +180,7 @@ const Visits: React.FC = () => {
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                       Property
                     </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider  sm:table-cell">
                       Date
                     </th>
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
@@ -189,7 +189,7 @@ const Visits: React.FC = () => {
                     <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
                       Budget
                     </th>
-                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                    <th className="text-left py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden sm:table-cell">
                       Stage
                     </th>
                   </tr>
@@ -207,7 +207,7 @@ const Visits: React.FC = () => {
                       <td className="py-3 px-4 text-muted-foreground text-xs">
                         {client.interestedProperty}
                       </td>
-                      <td className="py-3 px-4 text-xs text-muted-foreground hidden sm:table-cell">
+                      <td className="py-3 px-4 text-xs text-muted-foreground sm:table-cell">
                         {format(new Date(client.visit!), "MMM d, yyyy")}
                       </td>
                       <td className="py-3 px-4 text-xs font-mono text-primary hidden sm:table-cell">
@@ -217,7 +217,7 @@ const Visits: React.FC = () => {
                         {formatCurrency(client.budget!)}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary text-muted-foreground">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-secondary text-muted-foreground hidden sm:table-cell">
                           {client.stage.replace("_", " ")}
                         </span>
                       </td>

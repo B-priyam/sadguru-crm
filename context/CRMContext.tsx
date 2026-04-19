@@ -36,6 +36,12 @@ import {
   GetPropertiesAction,
 } from "@/actions/properties.action";
 import { toast } from "sonner";
+import {
+  getClientsOffline,
+  getPropertiesOffline,
+  saveClients,
+  saveProperties,
+} from "@/actions/offline.action";
 
 interface CRMContextType {
   clients: Client[];
@@ -109,22 +115,40 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [properties, setProperties] = useState<Property[]>([]);
 
   const getAllClients = async () => {
-    const allClients = await GetClients();
-    // console.log(allClients);
-    if (allClients?.success) {
-      setClients(allClients?.data as unknown as Client[]);
+    if (navigator.onLine) {
+      const allClients = await GetClients();
+      if (allClients?.data) {
+        await saveClients(allClients?.data as unknown as Client[]);
+        setClients(allClients?.data as unknown as Client[]);
+      } else {
+        setClients([]);
+      }
     } else {
-      setClients([]);
+      const allClients = await getClientsOffline();
+      if (allClients.length > 0) {
+        setClients(allClients);
+      } else {
+        setClients([]);
+      }
     }
   };
 
   const getAllProperties = async () => {
-    const allProperties = await GetPropertiesAction();
-    if (allProperties?.success) {
-      setProperties(allProperties.data as unknown as Property[]);
+    if (navigator.onLine) {
+      const allProperties = await GetPropertiesAction();
+      if (allProperties?.success) {
+        await saveProperties(allProperties?.data as unknown as Property[]);
+        setProperties(allProperties.data as unknown as Property[]);
+      } else {
+        setProperties([]);
+      }
     } else {
-      console.log("no data found");
-      setProperties([]);
+      const allProperties = await getPropertiesOffline();
+      if (allProperties?.length > 0) {
+        setProperties(allProperties);
+      } else {
+        setProperties([]);
+      }
     }
   };
 

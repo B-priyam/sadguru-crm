@@ -7,23 +7,16 @@ import { client } from "@/prisma/client";
 
 export const createClient = async (clientData: Client) => {
   try {
-    if (navigator.onLine) {
-      const create = await client.client.create({
-        data: clientData as any,
-      });
+    const create = await client.client.create({
+      data: clientData as any,
+    });
 
-      if (create) {
-        return {
-          success: true,
-          status: 201,
-          data: create,
-        };
-      }
-    } else {
-      // await addPendingAction({
-      //   method: "post",
-      //   data: clientData,
-      // });
+    if (create) {
+      return {
+        success: true,
+        status: 201,
+        data: create,
+      };
     }
   } catch (error) {
     return {

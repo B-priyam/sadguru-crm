@@ -223,8 +223,8 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 value={number}
                 onChange={(e) => {
                   const value = e.target.value.replace(/,/g, "");
-                  if (!/^\d*$/.test(value)) return;
-                  if (value.length > 13) return;
+                  if (!/^[\d\s+]*$/.test(value)) return;
+                  if (value.length > 18) return;
 
                   setNumber(value);
                 }}

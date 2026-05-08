@@ -113,3 +113,17 @@ export interface Client {
   occupation?: string;
   residence?: string;
 }
+
+export type FormFields =
+  | "name"
+  | "number"
+  | "budget"
+  | "location"
+  | "income"
+  | "occupation"
+  | "residence"
+  | "selectedPropertyId"
+  | "stage"
+  | "visit"
+  | "visitTime"
+  | "note";

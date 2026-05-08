@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { useCRM } from "@/context/CRMContext";
 import {
   PropertyType,
   LeadSource,
   PipelineStage,
   PIPELINE_STAGES,
+  FormFields,
 } from "@/types/crm";
 import { formatCurrency } from "@/lib/crm-utils";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import debounce from "lodash.debounce";
 
 interface Props {
   clientId?: string | null;
@@ -180,6 +182,96 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     setShowAddProperty(false);
   };
 
+  const setters = useMemo(
+    () => ({
+      name: setName,
+      number: setNumber,
+      budget: setBudget,
+      location: setLocation,
+      income: setIncome,
+      occupation: setOccupation,
+      residence: setResidence,
+      selectedPropertyId: setSelectedPropertyId,
+      stage: setStage,
+      visit: setVisit,
+      visitTime: setVisitTime,
+      note: setNote,
+    }),
+    [],
+  );
+
+  const debouncedSave = useCallback(
+    debounce((fieldName, value) => {
+      localStorage.setItem(
+        "pwa_form_data",
+        JSON.stringify({
+          name,
+          number,
+          budget,
+          location,
+          income,
+          occupation,
+          residence,
+          selectedPropertyId,
+          stage,
+          visit,
+          visitTime,
+          note,
+          [fieldName]: value,
+        }),
+      );
+
+      console.log(`Saved ${fieldName} to local storage`);
+    }, 1000),
+    [
+      name,
+      number,
+      budget,
+      location,
+      income,
+      occupation,
+      residence,
+      selectedPropertyId,
+      stage,
+      visit,
+      visitTime,
+      note,
+    ],
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const data = localStorage.getItem("pwa_form_data");
+
+    if (data) {
+      try {
+        const parsedData = JSON.parse(data);
+
+        Object.keys(parsedData).forEach((key) => {
+          const setter = setters[key as FormFields];
+          if (setter) {
+            setter(parsedData[key]);
+          }
+        });
+      } catch (err) {
+        console.error("Invalid localStorage data", err);
+      }
+    }
+  }, [setters]);
+
+  const saveToLocal = (e: React.ChangeEvent<HTMLInputElement> | any) => {
+    const { name, value } = e.target;
+
+    const setter = setters[name as FormFields];
+
+    if (setter) {
+      setter(value as any);
+    }
+
+    debouncedSave(name, value);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-foreground/20" onClick={onClose} />
@@ -201,7 +293,11 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-3"
+          onChange={saveToLocal}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
@@ -213,6 +309,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 className="h-9 text-sm mt-1"
                 required
                 placeholder="John Doe"
+                name="name"
               />
             </div>
             <div>
@@ -232,6 +329,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 placeholder="1234567890"
                 required
                 min={10}
+                name="number"
               />
             </div>
             <div>
@@ -253,6 +351,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 }}
                 className="h-9 text-sm mt-1"
                 placeholder="50,000"
+                name="income"
               />
             </div>
             <div>
@@ -265,6 +364,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 onChange={(e) => setLocation(e.target.value)}
                 className="h-9 text-sm mt-1"
                 placeholder="Bolivali"
+                name="location"
               />
             </div>
             <div>
@@ -276,6 +376,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 onValueChange={(v) => {
                   setOccupation(v);
                 }}
+                name="occupation"
               >
                 <SelectTrigger className="min-h-9 mt-1 text-sm flex-1 min-w-full">
                   <SelectValue placeholder="select residence" />
@@ -298,6 +399,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 onValueChange={(v) => {
                   setResidence(v);
                 }}
+                name="residence"
               >
                 <SelectTrigger className="min-h-9 mt-1 text-sm flex-1 min-w-full">
                   <SelectValue placeholder="select residence" />
@@ -330,6 +432,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 }}
                 className="h-9 text-sm mt-1"
                 placeholder="50,00,000"
+                name="budget"
               />
             </div>
             <div>
@@ -339,6 +442,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
               <Select
                 value={stage}
                 onValueChange={(v) => setStage(v as PipelineStage)}
+                name="stage"
               >
                 <SelectTrigger className="min-h-9 text-sm mt-1 w-full">
                   <SelectValue />
@@ -367,6 +471,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                     setSelectedPropertyId(v);
                     setSelectedUnitType("");
                   }}
+                  name="selectedPropertyId"
                 >
                   <SelectTrigger className="h-9 text-sm flex-1">
                     <SelectValue placeholder="Select property" />
@@ -401,6 +506,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                     onChange={(e) => setNewPropertyName(e.target.value)}
                     placeholder="Property name"
                     className="h-8 text-xs flex-1"
+                    name="newPropertyName"
                   />
                   <Button
                     type="button"
@@ -549,6 +655,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 value={visitTime}
                 onChange={(e) => setVisitTime(e.target.value)}
                 className="h-9 text-sm mt-1 dark:scheme-dark"
+                name="visitTime"
               />
             </div>
           </div>
@@ -563,6 +670,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
               onChange={(e) => setNote(e.target.value)}
               className="text-sm mt-1 min-h-[60px]"
               placeholder="Enter some note to remember..."
+              name="note"
             />
           </div>
           {/* )} */}

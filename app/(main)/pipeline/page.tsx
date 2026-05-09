@@ -103,7 +103,7 @@ const Pipeline: React.FC = () => {
                     <div className="flex flex-col gap-1.5">
                       <div className="flex justify-between items-start">
                         <span className="text-sm font-semibold text-foreground tracking-tight">
-                          {client.name}
+                          {client.clientName}
                         </span>
                         {stage.id === "deal_closed" && (
                           <span className="text-[10px] font-bold uppercase tracking-wider text-accent-foreground bg-gold-bg px-1.5 py-0.5 rounded">

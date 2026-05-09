@@ -135,11 +135,11 @@ const Visits: React.FC = () => {
             >
               <div className="flex items-start gap-3">
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary flex-shrink-0">
-                  {getInitials(client.name)}
+                  {getInitials(client.clientName)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold text-foreground">
-                    {client.name}
+                    {client.clientName}
                   </h3>
                   <p className="text-xs text-muted-foreground truncate">
                     {client.interestedProperty}
@@ -202,7 +202,7 @@ const Visits: React.FC = () => {
                       onClick={() => setSelectedClientId(client.id!)}
                     >
                       <td className="py-3 px-4 font-medium text-foreground">
-                        {client.name}
+                        {client.clientName}
                       </td>
                       <td className="py-3 px-4 text-muted-foreground text-xs">
                         {client.interestedProperty}

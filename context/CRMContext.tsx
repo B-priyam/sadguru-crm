@@ -117,35 +117,35 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
     queryKey: ["clients", currentPage],
 
     queryFn: async () => {
-      if (navigator.onLine) {
-        const allClients = await GetClients(currentPage, pageDataLength);
+      // if (navigator.onLine) {
+      const allClients = await GetClients(currentPage, pageDataLength);
 
-        if (allClients?.data) {
-          setTotalPages(allClients.totalPages);
+      if (allClients?.data) {
+        setTotalPages(allClients.totalPages);
 
-          await saveClients(allClients.data as unknown as Client[]);
+        await saveClients(allClients.data as unknown as Client[]);
 
-          return allClients;
-        }
-
-        return {
-          data: [],
-          totalPages: 0,
-        };
+        return allClients;
       }
 
-      const offlineClients = await getClientsOffline();
-
       return {
-        data: offlineClients,
-        totalPages: 1,
+        data: [],
+        totalPages: 0,
       };
+      // }
+
+      // const offlineClients = await getClientsOffline();
+
+      // return {
+      //   data: offlineClients,
+      //   totalPages: 1,
+      // };
     },
 
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 30, // cache for 30 mins
 
-    placeholderData: (previousData) => previousData,
+    // placeholderData: (previousData) => previousData,
   });
 
   useEffect(() => {

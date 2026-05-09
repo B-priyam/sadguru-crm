@@ -117,11 +117,11 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
-                  {getInitials(client.name)}
+                  {getInitials(client.clientName)}
                 </div>
                 <div>
                   <h2 className="text-sm font-semibold text-foreground">
-                    {client.name}
+                    {client.clientName}
                   </h2>
                   {/* <p className="text-xs text-muted-foreground">
                     {client.email}

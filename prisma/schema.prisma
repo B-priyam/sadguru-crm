@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../lib/generated/prisma"
@@ -14,36 +9,36 @@ datasource db {
 
 model Client {
   id                 String    @id @default(uuid())
-  name               String
-  stage              String
-  number             String
-  alternateNumber    String[]
-  occupation         String?
-  income             String?
-  residence          String?
-  location           String?
-  interestedProperty String?
-  propertyType       String?
-  propertyArea       String?
+  clientName         String
   budget             String?
-  visit              DateTime?
-  notes              Json?
-  followUp           Json?
   createdAt          DateTime  @default(now())
+  income             String?
+  interestedProperty String?
+  location           String?
+  number             String
+  occupation         String?
+  propertyType       String?
+  residence          String?
+  stage              String
   updatedAt          DateTime?
+  visit              DateTime?
+  alternateNumber    String[]
+  followUp           Json?
+  notes              Json?
+  propertyArea       String?
 }
 
 model Property {
   id        String   @id @default(uuid())
   name      String
-  units     Json
   location  String
   createdAt DateTime @default(now())
+  units     Json
 }
 
 model RecentlyDeleted {
   id                 String    @id @default(uuid())
-  name               String
+  clientName         String
   stage              String
   number             String
   alternateNumber    String[]
@@ -53,10 +48,10 @@ model RecentlyDeleted {
   location           String?
   interestedProperty String?
   propertyType       String?
-  propertyArea       String?
   budget             String?
   visit              DateTime?
-  notes              Json?
-  followUp           Json?
   createdAt          DateTime  @default(now())
+  followUp           Json?
+  notes              Json?
+  propertyArea       String?
 }

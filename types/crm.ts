@@ -92,7 +92,7 @@ export interface FollowUp {
 
 export interface Client {
   id?: string;
-  name: string;
+  clientName: string;
   number: string;
   // email: string;
   budget?: string;
@@ -115,7 +115,7 @@ export interface Client {
 }
 
 export type FormFields =
-  | "name"
+  | "clientName"
   | "number"
   | "budget"
   | "location"

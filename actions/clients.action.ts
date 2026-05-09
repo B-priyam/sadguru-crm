@@ -27,15 +27,26 @@ export const createClient = async (clientData: Client) => {
   }
 };
 
-export const GetClients = async () => {
+export const GetClients = async (
+  currentPage: number,
+  pageDataLength: number,
+) => {
   try {
-    const fetch = await client.client.findMany({});
+    const [fetch, totalClients] = await Promise.all([
+      client.client.findMany({
+        skip: (currentPage - 1) * pageDataLength,
+        take: pageDataLength,
+      }),
+
+      client.client.count(),
+    ]);
 
     if (fetch) {
       return {
         success: true,
         status: 200,
         data: fetch,
+        totalPages: Math.ceil(totalClients / pageDataLength),
       };
     }
   } catch (error) {
@@ -44,6 +55,7 @@ export const GetClients = async () => {
       success: false,
       status: 500,
       data: [],
+      totalPages: 0,
     };
   }
 };

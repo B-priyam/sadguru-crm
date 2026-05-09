@@ -42,6 +42,7 @@ import {
   saveClients,
   saveProperties,
 } from "@/actions/offline.action";
+import { useQuery } from "@tanstack/react-query";
 
 interface CRMContextType {
   clients: Client[];
@@ -56,9 +57,13 @@ interface CRMContextType {
   searchQuery: string;
   setSearchQuery: (q: string) => void;
   properties: Property[];
+  currentPage: number;
+  pageDataLength: number;
   addProperty: (property: Omit<Property, "id">) => void;
   updateProperty: (id: string, updates: Partial<Property>) => void;
   deleteProperty: (id: string) => void;
+  totalPages: number;
+  setCurrentPage: (pageNumber: number) => void;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -68,19 +73,6 @@ export const useCRM = () => {
   if (!ctx) throw new Error("useCRM must be used within CRMProvider");
   return ctx;
 };
-
-const locations = [
-  "Sector 45",
-  "Green Valley",
-  "Downtown",
-  "Lake View",
-  "Palm Road",
-  "Metro Area",
-  "Garden Lane",
-  "Royal Road",
-  "City Center",
-  "Heritage Block",
-];
 
 // const defaultProperties: Property[] = DEFAULT_PROPERTIES.map((name, i) => ({
 //   id: crypto.randomUUID(),
@@ -113,25 +105,55 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [clients, setClients] = useState<Client[] | []>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [properties, setProperties] = useState<Property[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageDataLength, setPageDataLength] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const getAllClients = async () => {
-    if (navigator.onLine) {
-      const allClients = await GetClients();
-      if (allClients?.data) {
-        await saveClients(allClients?.data as unknown as Client[]);
-        setClients(allClients?.data as unknown as Client[]);
-      } else {
-        setClients([]);
+  const {
+    data: clientsData,
+    isLoading,
+    isFetching,
+  } = useQuery({
+    queryKey: ["clients", currentPage],
+
+    queryFn: async () => {
+      if (navigator.onLine) {
+        const allClients = await GetClients(currentPage, pageDataLength);
+
+        if (allClients?.data) {
+          setTotalPages(allClients.totalPages);
+
+          await saveClients(allClients.data as unknown as Client[]);
+
+          return allClients;
+        }
+
+        return {
+          data: [],
+          totalPages: 0,
+        };
       }
-    } else {
-      const allClients = await getClientsOffline();
-      if (allClients.length > 0) {
-        setClients(allClients);
-      } else {
-        setClients([]);
-      }
+
+      const offlineClients = await getClientsOffline();
+
+      return {
+        data: offlineClients,
+        totalPages: 1,
+      };
+    },
+
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 30, // cache for 30 mins
+
+    placeholderData: (previousData) => previousData,
+  });
+
+  useEffect(() => {
+    if (clientsData) {
+      setClients((clientsData?.data as unknown as Client[]) || []);
+      setTotalPages(clientsData.totalPages);
     }
-  };
+  }, [clientsData]);
 
   const getAllProperties = async () => {
     if (navigator.onLine) {
@@ -153,9 +175,13 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    getAllClients();
+    // getAllClients();
     getAllProperties();
   }, []);
+
+  // useEffect(() => {
+  //   getAllClients();
+  // }, [currentPage]);
 
   // const addActivity = (
   //   client: Client,
@@ -366,6 +392,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
         addProperty,
         updateProperty,
         deleteProperty,
+        currentPage,
+        pageDataLength,
+        totalPages,
+        setCurrentPage,
       }}
     >
       {children}

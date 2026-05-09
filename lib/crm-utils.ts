@@ -34,7 +34,7 @@ export function useFilteredClients() {
   const q = searchQuery.toLowerCase();
   return clients.filter(
     (c) =>
-      c.name.toLowerCase().includes(q) ||
+      c.clientName.toLowerCase().includes(q) ||
       // c.email.toLowerCase().includes(q) ||
       c.number.includes(q) ||
       c.interestedProperty?.toLowerCase().includes(q),

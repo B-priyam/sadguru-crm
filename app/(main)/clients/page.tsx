@@ -13,7 +13,17 @@ import {
   LeadSource,
   PipelineStage,
 } from "@/types/crm";
-import { Search, Plus, Trash2, Pencil, Download } from "lucide-react";
+import {
+  Search,
+  Plus,
+  Trash2,
+  Pencil,
+  Download,
+  ChevronsLeftIcon,
+  ChevronLeft,
+  ChevronRightIcon,
+  ChevronsRightIcon,
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ClientForm from "@/components/ClientForm";
@@ -36,10 +46,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { format } from "date-fns";
 
 const Clients: React.FC = () => {
-  const { deleteClient, searchQuery, setSearchQuery } = useCRM();
+  const {
+    deleteClient,
+    searchQuery,
+    setSearchQuery,
+    currentPage,
+    pageDataLength,
+    setCurrentPage,
+    totalPages,
+  } = useCRM();
   const filteredClients = useFilteredClients();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -70,7 +97,7 @@ const Clients: React.FC = () => {
       "Date Added",
     ];
     const rows = displayClients.map((c) => [
-      c.name,
+      c.clientName,
       c.number,
       c.budget,
       c.interestedProperty,
@@ -89,6 +116,18 @@ const Clients: React.FC = () => {
     a.href = url;
     a.download = "clients.csv";
     a.click();
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
@@ -186,7 +225,7 @@ const Clients: React.FC = () => {
                   onClick={() => setSelectedId(client.id!)}
                 >
                   <td className="py-3 px-4 font-medium text-foreground">
-                    {client.name}
+                    {client.clientName}
                   </td>
                   <td className="py-3 px-4 text-muted-foreground hidden md:table-cell">
                     {/* <div className="text-xs">{client.email}</div> */}
@@ -240,7 +279,43 @@ const Clients: React.FC = () => {
               ))}
             </tbody>
           </table>
+          <Pagination className="mt-1">
+            <PaginationContent>
+              <Button
+                onClick={() => setCurrentPage(1)}
+                variant={"outline"}
+                disabled={currentPage === 1}
+              >
+                <ChevronsLeftIcon className={`size-5`} />
+              </Button>
+              <Button
+                disabled={currentPage === 1}
+                onClick={handlePrevPage}
+                variant={"outline"}
+              >
+                <ChevronLeft className={`size-5`} />
+              </Button>
+              <PaginationItem>
+                <PaginationLink isActive>{currentPage}</PaginationLink>
+              </PaginationItem>
+              <Button
+                variant={"outline"}
+                disabled={currentPage === totalPages}
+                onClick={handleNextPage}
+              >
+                <ChevronRightIcon className={`size-5`} />
+              </Button>
+              <Button
+                variant={"outline"}
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(totalPages)}
+              >
+                <ChevronsRightIcon className={`size-5`} />
+              </Button>
+            </PaginationContent>
+          </Pagination>
         </div>
+        <p className="text-xs text-gray-500 p-2">{`showing page ${currentPage} of ${totalPages}`}</p>
       </div>
 
       {showForm && (

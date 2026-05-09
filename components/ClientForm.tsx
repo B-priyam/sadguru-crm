@@ -59,7 +59,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     useCRM();
   const existing = clientId ? clients.find((c) => c.id === clientId) : null;
 
-  const [name, setName] = useState(existing?.name || "");
+  const [clientName, setClientName] = useState(existing?.clientName || "");
   const [number, setNumber] = useState(existing?.number || "");
   const [budget, setBudget] = useState(existing?.budget || "");
   const [location, setLocation] = useState(existing?.location || "");
@@ -114,7 +114,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    if (!clientName.trim()) return;
 
     let visitDateISO: string | undefined;
     if (visit) {
@@ -128,7 +128,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
 
     if (existing) {
       updateClient(existing.id!, {
-        name,
+        clientName,
         number,
         budget: budget,
         interestedProperty: propertyName,
@@ -144,7 +144,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
       });
     } else {
       addClient({
-        name,
+        clientName,
         number,
         // email,
         budget,
@@ -184,7 +184,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
 
   const setters = useMemo(
     () => ({
-      name: setName,
+      clientName: setClientName,
       number: setNumber,
       budget: setBudget,
       location: setLocation,
@@ -200,31 +200,30 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     [],
   );
 
-  const debouncedSave = useCallback(
-    debounce((fieldName, value) => {
-      localStorage.setItem(
-        "pwa_form_data",
-        JSON.stringify({
-          name,
-          number,
-          budget,
-          location,
-          income,
-          occupation,
-          residence,
-          selectedPropertyId,
-          stage,
-          visit,
-          visitTime,
-          note,
-          [fieldName]: value,
-        }),
-      );
+  const debouncedSave = useMemo(
+    () =>
+      debounce((formData) => {
+        localStorage.setItem("pwa_form_data", JSON.stringify(formData));
 
-      console.log(`Saved ${fieldName} to local storage`);
-    }, 1000),
-    [
-      name,
+        console.log("Saved to local storage");
+      }, 1000),
+    [],
+  );
+
+  const saveToLocal = (e: React.ChangeEvent<HTMLInputElement | any>) => {
+    const { name, value } = e.target;
+
+    console.log(name, value);
+
+    // const setter = setters[name as FormFields];
+
+    // if (setter) {
+    //   setter(value as any);
+    // }
+
+    // Build updated form object
+    const updatedData = {
+      clientName,
       number,
       budget,
       location,
@@ -236,8 +235,11 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
       visit,
       visitTime,
       note,
-    ],
-  );
+      [name]: value,
+    };
+
+    debouncedSave(updatedData);
+  };
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -258,19 +260,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         console.error("Invalid localStorage data", err);
       }
     }
-  }, [setters]);
-
-  const saveToLocal = (e: React.ChangeEvent<HTMLInputElement> | any) => {
-    const { name, value } = e.target;
-
-    const setter = setters[name as FormFields];
-
-    if (setter) {
-      setter(value as any);
-    }
-
-    debouncedSave(name, value);
-  };
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -304,12 +294,12 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 Name *
               </label>
               <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
                 className="h-9 text-sm mt-1"
                 required
                 placeholder="John Doe"
-                name="name"
+                name="clientName"
               />
             </div>
             <div>

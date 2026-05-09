@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CRMProvider } from "@/context/CRMContext";
 import { Toaster } from "sonner";
+import QueryProvider from "@/providers/queryProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,7 +33,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Toaster />
-        <CRMProvider>{children}</CRMProvider>
+        <QueryProvider>
+          <CRMProvider>{children}</CRMProvider>
+        </QueryProvider>
       </body>
     </html>
   );

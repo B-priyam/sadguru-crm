@@ -47,14 +47,24 @@ export const DEFAULT_PROPERTIES = [
   "Heritage Plots",
 ];
 
-export type UnitType = "1bhk" | "2bhk" | "3bhk" | "4bhk" | "5bhk";
+export type UnitType =
+  | "1bhk"
+  | "2bhk"
+  | "3bhk"
+  | "4bhk"
+  | "5bhk"
+  | "1+1"
+  | "2+1"
+  | "2+2";
 
 export const UNIT_TYPES: { value: UnitType; label: string }[] = [
   { value: "1bhk", label: "1 BHK" },
   { value: "2bhk", label: "2 BHK" },
   { value: "3bhk", label: "3 BHK" },
   { value: "4bhk", label: "4 BHK" },
-  { value: "5bhk", label: "5 BHK" },
+  { value: "1+1", label: "1+1" },
+  { value: "2+1", label: "2+1" },
+  { value: "2+2", label: "2+2" },
 ];
 
 export interface PropertyUnit {

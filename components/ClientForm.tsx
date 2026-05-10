@@ -244,20 +244,22 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const data = localStorage.getItem("pwa_form_data");
+    if (!existing) {
+      const data = localStorage.getItem("pwa_form_data");
 
-    if (data) {
-      try {
-        const parsedData = JSON.parse(data);
+      if (data) {
+        try {
+          const parsedData = JSON.parse(data);
 
-        Object.keys(parsedData).forEach((key) => {
-          const setter = setters[key as FormFields];
-          if (setter) {
-            setter(parsedData[key]);
-          }
-        });
-      } catch (err) {
-        console.error("Invalid localStorage data", err);
+          Object.keys(parsedData).forEach((key) => {
+            const setter = setters[key as FormFields];
+            if (setter) {
+              setter(parsedData[key]);
+            }
+          });
+        } catch (err) {
+          console.error("Invalid localStorage data", err);
+        }
       }
     }
   }, []);

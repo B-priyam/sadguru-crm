@@ -36,10 +36,9 @@ const STAGE_COLORS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { clients } = useCRM();
+  const { clients, totalClients } = useCRM();
 
   const stats = useMemo(() => {
-    const totalClients = clients.length;
     const activeLeads = clients.filter(
       (c) => !["deal_closed", "lost"].includes(c.stage),
     ).length;
@@ -52,7 +51,9 @@ const Dashboard: React.FC = () => {
     //   0,
     // );
     const conversionRate =
-      totalClients > 0 ? Math.round((dealsClosed / totalClients) * 100) : 0;
+      Number(totalClients) > 0
+        ? Math.round((dealsClosed / Number(totalClients)) * 100)
+        : 0;
     return {
       totalClients,
       activeLeads,

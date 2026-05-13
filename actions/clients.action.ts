@@ -47,6 +47,7 @@ export const GetClients = async (
         status: 200,
         data: fetch,
         totalPages: Math.ceil(totalClients / pageDataLength),
+        totalClients,
       };
     }
   } catch (error) {
@@ -56,6 +57,7 @@ export const GetClients = async (
       status: 500,
       data: [],
       totalPages: 0,
+      totalClients: 0,
     };
   }
 };

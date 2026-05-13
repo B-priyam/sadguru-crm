@@ -7,6 +7,17 @@ datasource db {
   provider = "postgresql"
 }
 
+model User {
+  id              String            @id @default(uuid())
+  name            String
+  email           String            @unique
+  password        String
+  createdAt       DateTime          @default(now())
+  clients         Client[]
+  properties      Property[]
+  relentlyDeleted RecentlyDeleted[]
+}
+
 model Client {
   id                 String    @id @default(uuid())
   clientName         String
@@ -26,6 +37,8 @@ model Client {
   followUp           Json?
   notes              Json?
   propertyArea       String?
+  userId             String
+  user               User?     @relation(fields: [userId], references: [id])
 }
 
 model Property {
@@ -34,6 +47,8 @@ model Property {
   location  String
   createdAt DateTime @default(now())
   units     Json
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
 }
 
 model RecentlyDeleted {
@@ -54,4 +69,6 @@ model RecentlyDeleted {
   followUp           Json?
   notes              Json?
   propertyArea       String?
+  userId             String?
+  user               User?     @relation(fields: [userId], references: [id])
 }

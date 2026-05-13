@@ -64,6 +64,7 @@ interface CRMContextType {
   deleteProperty: (id: string) => void;
   totalPages: number;
   setCurrentPage: (pageNumber: number) => void;
+  totalClients: number | string;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -108,6 +109,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageDataLength, setPageDataLength] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalClients, setTotalClients] = useState(0);
 
   const {
     data: clientsData,
@@ -131,6 +133,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
       return {
         data: [],
         totalPages: 0,
+        totalClients,
       };
       // }
 
@@ -152,6 +155,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
     if (clientsData) {
       setClients((clientsData?.data as unknown as Client[]) || []);
       setTotalPages(clientsData.totalPages);
+      setTotalClients(clientsData.totalClients);
     }
   }, [clientsData]);
 
@@ -377,6 +381,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <CRMContext.Provider
       value={{
+        totalClients,
         clients,
         addClient,
         updateClient,

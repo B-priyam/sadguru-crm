@@ -5,7 +5,7 @@ export function formatCurrency(amount: string): string {
   const amt = Number(amount);
   if (amt >= 10000000) return `₹${(amt / 10000000).toFixed(1)}Cr`;
   if (amt >= 100000) return `₹${(amt / 100000).toFixed(1)}L`;
-  return `₹${amount.toLocaleString()}`;
+  return `₹${amount?.toLocaleString()}`;
 }
 
 export function formatTimeAgo(date: string): string {

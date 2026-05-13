@@ -213,7 +213,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const saveToLocal = (e: React.ChangeEvent<HTMLInputElement | any>) => {
     const { name, value } = e.target;
 
-    console.log(name, value);
+    if (existing) return;
 
     // const setter = setters[name as FormFields];
 

@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "lib/scripts/uploadToPrisma.js"  ],
   "exclude": [
     "node_modules",
     ".next"

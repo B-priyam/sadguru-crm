@@ -123,7 +123,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
       const allClients = await GetClients(currentPage, pageDataLength);
 
       if (allClients?.data) {
-        setTotalPages(allClients.totalPages);
+        setTotalPages(allClients?.totalPages || 0);
 
         await saveClients(allClients.data as unknown as Client[]);
 
@@ -154,8 +154,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (clientsData) {
       setClients((clientsData?.data as unknown as Client[]) || []);
-      setTotalPages(clientsData.totalPages);
-      setTotalClients(clientsData.totalClients);
+      setTotalPages(clientsData?.totalPages || 0);
+      setTotalClients(clientsData?.totalClients || 0);
     }
   }, [clientsData]);
 

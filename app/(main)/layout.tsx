@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Kanban,
@@ -11,6 +11,8 @@ import {
   Building2,
   Sun,
   Moon,
+  HamburgerIcon,
+  MenuIcon,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { Switch } from "@/components/ui/switch";
@@ -25,6 +27,7 @@ const navItems = [
   { to: "/clients", label: "Clients", icon: Users },
   { to: "/properties", label: "Properties", icon: Building2 },
   { to: "/visits", label: "Visits", icon: MapPin },
+  { to: "/visits", label: "Active Clients", icon: MapPin },
   { to: "/bookings", label: "Bookings", icon: CalendarCheck },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
@@ -33,6 +36,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const isOnline = useOnlineStatus();
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     if (isOnline) {
@@ -40,10 +44,23 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
   }, [isOnline]);
 
+  const handleMenuClick = () => {
+    if (showMenu) {
+      setShowMenu(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[220px] flex-col bg-card card-shadow z-30">
+      {showMenu && (
+        <div className="absolute z-50">
+          <MenuIcon className="" onClick={() => setShowMenu(true)} />
+        </div>
+      )}
+      <aside
+        className={`${showMenu ? "flex" : "hidden"} transition-all duration-300 lg:flex fixed inset-y-0 left-0 w-[220px] flex-col bg-card card-shadow z-30`}
+      >
         <div className="p-4">
           <h1 className="text-sm font-bold text-primary tracking-tight">
             EstateFlow
@@ -62,6 +79,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 }`}
+                onClick={handleMenuClick}
               >
                 <item.icon size={16} strokeWidth={1.5} />
                 {item.label}
@@ -88,7 +106,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       </aside>
 
       {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-card card-shadow z-30 flex  items-center py-2 px-1">
+      <nav className="lg:hidden w-full overflow-x-scroll fixed bottom-0 inset-x-0 bg-card card-shadow z-30 flex  items-center py-2 px-1">
         {navItems.map((item) => {
           const isActive = pathname === item.to;
           return (

@@ -136,6 +136,8 @@ const Clients: React.FC = () => {
     }
   };
 
+  console.log();
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);

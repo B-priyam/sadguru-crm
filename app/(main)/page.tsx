@@ -37,7 +37,7 @@ const STAGE_COLORS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { clients, totalClients, setGlobalStage } = useCRM();
+  const { clients, totalClients } = useCRM();
   const router = useRouter();
 
   const stats = useMemo(() => {
@@ -83,9 +83,9 @@ const Dashboard: React.FC = () => {
     })).filter((d) => d.value > 0);
   }, [clients]);
 
-  const handleRoute = (stage: PipelineStage) => {
-    setGlobalStage(stage);
-  };
+  // const handleRoute = (stage: PipelineStage) => {
+  //   setGlobalStage(stage);
+  // };
 
   return (
     <div className="space-y-6">

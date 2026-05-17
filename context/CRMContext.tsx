@@ -116,7 +116,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [pageDataLength, setPageDataLength] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalClients, setTotalClients] = useState(0);
-  const [stageFilter, setStageFilter] = useState("");
+  const [stageFilter, setStageFilter] = useState("all");
   const [totalFilteredClients, setTotalFilteredClients] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 

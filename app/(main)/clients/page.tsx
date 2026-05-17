@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useCRM } from "@/context/CRMContext";
 import {
   useFilteredClients,
@@ -66,6 +66,8 @@ const Clients: React.FC = () => {
     stageFilter,
     setStageFilter,
     totalFilteredClients,
+    debouncedSearchQuery,
+    setDebouncedSearchQuery,
   } = useCRM();
   const filteredClients = useFilteredClients();
   const [showForm, setShowForm] = useState(false);
@@ -133,6 +135,14 @@ const Clients: React.FC = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   return (
     <div className="space-y-4">

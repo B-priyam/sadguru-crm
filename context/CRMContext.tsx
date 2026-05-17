@@ -69,6 +69,8 @@ interface CRMContextType {
   setStageFilter: (stage: PipelineStage) => void;
   totalFilteredClients: number;
   setTotalFilteredClients: (clients: number) => void;
+  debouncedSearchQuery: string;
+  setDebouncedSearchQuery: (value: string) => void;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -116,20 +118,21 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [totalClients, setTotalClients] = useState(0);
   const [stageFilter, setStageFilter] = useState("");
   const [totalFilteredClients, setTotalFilteredClients] = useState(0);
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
   const {
     data: clientsData,
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["clients", currentPage, searchQuery, stageFilter],
+    queryKey: ["clients", currentPage, debouncedSearchQuery, stageFilter],
 
     queryFn: async () => {
       // if (navigator.onLine) {
       const allClients = await GetClients(
         currentPage,
         pageDataLength,
-        searchQuery,
+        debouncedSearchQuery,
         stageFilter,
       );
 
@@ -398,6 +401,8 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <CRMContext.Provider
       value={{
+        debouncedSearchQuery,
+        setDebouncedSearchQuery,
         totalFilteredClients,
         setTotalFilteredClients,
         stageFilter,

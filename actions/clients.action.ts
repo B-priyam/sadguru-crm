@@ -39,6 +39,8 @@ export const createClient = async (clientData: Client) => {
 export const GetClients = async (
   currentPage: number,
   pageDataLength: number,
+  searchQuery: string,
+  stage: string,
 ) => {
   const userDetails = await getSession();
   if (!userDetails) {
@@ -49,6 +51,29 @@ export const GetClients = async (
     };
   }
   try {
+    const whereClause: any = {
+      ...(searchQuery && {
+        OR: [
+          {
+            clientName: {
+              contains: searchQuery,
+              mode: "insensitive",
+            },
+          },
+          {
+            number: {
+              contains: searchQuery,
+              mode: "insensitive",
+            },
+          },
+        ],
+      }),
+
+      ...(stage &&
+        stage !== "all" && {
+          stage: stage,
+        }),
+    };
     const [fetch, totalClients] = await Promise.all([
       client.client.findMany({
         skip: (currentPage - 1) * pageDataLength,
@@ -56,6 +81,7 @@ export const GetClients = async (
         orderBy: {
           createdAt: "desc",
         },
+        where: whereClause,
       }),
 
       client.client.count(),
@@ -66,7 +92,7 @@ export const GetClients = async (
         success: true,
         status: 200,
         data: fetch,
-        totalPages: Math.ceil(totalClients / pageDataLength),
+        totalPages: Math.ceil(fetch.length / pageDataLength),
         totalClients,
       };
     }

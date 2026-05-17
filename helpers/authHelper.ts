@@ -1,3 +1,5 @@
+"use server";
+
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
@@ -15,11 +17,11 @@ export const comparePassword = async (
   return bcrypt.compare(password, hashedPassword);
 };
 
-export const generateToken = (userId: string) => {
+export const generateToken = async (userId: string) => {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: "2h" });
 };
 
-export const verifyToken = (token: string) => {
+export const verifyToken = async (token: string) => {
   return jwt.verify(token, JWT_SECRET);
 };
 

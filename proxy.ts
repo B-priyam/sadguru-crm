@@ -8,7 +8,8 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Always allow public routes
-  const isPublicRoute = pathname === "/login" || pathname === "/register";
+  const isPublicRoute =
+    pathname === "/login" || pathname === "/forgot-password";
 
   // ❌ No token → force login (for all protected routes)
   if (!token && !isPublicRoute) {
@@ -33,12 +34,12 @@ export function proxy(request: NextRequest) {
 
   // Optional: prevent logged-in users from seeing login/register
   if (token && isPublicRoute) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/", "/:path", "/dashboard/:path*", "/login", "/register"],
+  matcher: ["/", "/:path", "/dashboard/:path*", "/login", "/forgot-password"],
 };

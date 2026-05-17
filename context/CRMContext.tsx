@@ -65,6 +65,10 @@ interface CRMContextType {
   totalPages: number;
   setCurrentPage: (pageNumber: number) => void;
   totalClients: number | string;
+  stageFilter: string;
+  setStageFilter: (stage: PipelineStage) => void;
+  totalFilteredClients: number;
+  setTotalFilteredClients: (clients: number) => void;
 }
 
 const CRMContext = createContext<CRMContextType | undefined>(undefined);
@@ -110,30 +114,42 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [pageDataLength, setPageDataLength] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalClients, setTotalClients] = useState(0);
+  const [stageFilter, setStageFilter] = useState("");
+  const [totalFilteredClients, setTotalFilteredClients] = useState(0);
 
   const {
     data: clientsData,
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["clients", currentPage],
+    queryKey: ["clients", currentPage, searchQuery, stageFilter],
 
     queryFn: async () => {
       // if (navigator.onLine) {
-      const allClients = await GetClients(currentPage, pageDataLength);
+      const allClients = await GetClients(
+        currentPage,
+        pageDataLength,
+        searchQuery,
+        stageFilter,
+      );
 
       if (allClients?.data) {
         setTotalPages(allClients?.totalPages || 0);
 
         await saveClients(allClients.data as unknown as Client[]);
 
-        return allClients;
+        console.log("allClients", {
+          ...allClients,
+          totalFilteredClients: allClients.data.length,
+        });
+        return { ...allClients, totalFilteredClients: allClients.data.length };
       }
 
       return {
         data: [],
         totalPages: 0,
         totalClients,
+        totalFilteredClients,
       };
       // }
 
@@ -156,6 +172,7 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
       setClients((clientsData?.data as unknown as Client[]) || []);
       setTotalPages(clientsData?.totalPages || 0);
       setTotalClients(clientsData?.totalClients || 0);
+      setTotalFilteredClients(clientsData?.totalFilteredClients || 0);
     }
   }, [clientsData]);
 
@@ -381,6 +398,10 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <CRMContext.Provider
       value={{
+        totalFilteredClients,
+        setTotalFilteredClients,
+        stageFilter,
+        setStageFilter,
         totalClients,
         clients,
         addClient,

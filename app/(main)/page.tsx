@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import { useCRM } from "@/context/CRMContext";
-import { PIPELINE_STAGES } from "@/types/crm";
+import { PIPELINE_STAGES, PipelineStage } from "@/types/crm";
 import { formatCurrency } from "@/lib/crm-utils";
 import KPICard from "@/components/KPICard";
 import {
@@ -24,6 +24,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useRouter } from "next/navigation";
 
 const STAGE_COLORS = [
   "hsl(161,94%,30%)",
@@ -36,7 +37,8 @@ const STAGE_COLORS = [
 ];
 
 const Dashboard: React.FC = () => {
-  const { clients, totalClients } = useCRM();
+  const { clients, totalClients, setGlobalStage } = useCRM();
+  const router = useRouter();
 
   const stats = useMemo(() => {
     const activeLeads = clients.filter(
@@ -81,6 +83,10 @@ const Dashboard: React.FC = () => {
     })).filter((d) => d.value > 0);
   }, [clients]);
 
+  const handleRoute = (stage: PipelineStage) => {
+    setGlobalStage(stage);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -96,6 +102,7 @@ const Dashboard: React.FC = () => {
         <KPICard
           label="Total Clients"
           value={stats.totalClients}
+          onClick={() => router.push("/clients")}
           icon={<Users size={18} strokeWidth={1.5} />}
         />
         <KPICard

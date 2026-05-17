@@ -5,10 +5,20 @@ interface KPICardProps {
   value: string | number;
   subtitle?: string;
   icon: React.ReactNode;
+  onClick?: () => void;
 }
 
-const KPICard: React.FC<KPICardProps> = ({ label, value, subtitle, icon }) => (
-  <div className="rounded-xl bg-card p-3 sm:p-4 card-shadow transition-all duration-200 ease-snap hover:card-shadow-hover">
+const KPICard: React.FC<KPICardProps> = ({
+  label,
+  value,
+  subtitle,
+  icon,
+  onClick,
+}) => (
+  <div
+    className="rounded-xl bg-card p-3 sm:p-4 card-shadow transition-all duration-200 ease-snap hover:card-shadow-hover"
+    onClick={onClick}
+  >
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0">
         <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-medium truncate">

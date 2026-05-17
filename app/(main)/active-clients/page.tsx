@@ -5,13 +5,7 @@ import { useCRM } from "@/context/CRMContext";
 import { PIPELINE_STAGES, PipelineStage } from "@/types/crm";
 import { formatCurrency, getInitials } from "@/lib/crm-utils";
 import { Input } from "@/components/ui/input";
-import {
-  Search,
-  BookCheck,
-  TrendingUp,
-  IndianRupee,
-  Filter,
-} from "lucide-react";
+import { Search, UserCheck, Filter } from "lucide-react";
 import ClientSlideOver from "@/components/ClientSlideOver";
 import {
   Select,
@@ -30,40 +24,45 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-const BOOKING_STAGES: PipelineStage[] = ["booking_confirmed", "deal_closed"];
+const ACTIVE_STAGES: PipelineStage[] = [
+  "new_lead",
+  "contacted",
+  "site_visit",
+  "negotiation",
+  "booking_confirmed",
+];
 
-const Bookings: React.FC = () => {
+const ActiveLeads: React.FC = () => {
   const { clients } = useCRM();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const bookings = useMemo(
-    () => clients.filter((c) => BOOKING_STAGES.includes(c.stage)),
-    [clients],
-  );
+  const activeClients = useMemo(() => {
+    return clients.filter((c) => ACTIVE_STAGES.includes(c.stage));
+  }, [clients]);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();
-    return bookings.filter((c) => {
+    return activeClients.filter((c) => {
       if (stageFilter !== "all" && c.stage !== stageFilter) return false;
       if (!q) return true;
       return (
         c.clientName.toLowerCase().includes(q) ||
         (c.number || "").includes(q) ||
-        (c.interestedProperty || "").toLowerCase().includes(q)
+        (c.interestedProperty || "").toLowerCase().includes(q) ||
+        (c.location || "").toLowerCase().includes(q)
       );
     });
-  }, [bookings, query, stageFilter]);
+  }, [activeClients, query, stageFilter]);
 
-  const confirmedCount = bookings.filter(
-    (b) => b.stage === "booking_confirmed",
-  ).length;
-  const closedCount = bookings.filter((b) => b.stage === "deal_closed").length;
-  const totalValue = bookings.reduce(
-    (sum, b) => sum + (Number(b.budget) || 0),
-    0,
-  );
+  const stageCounts = useMemo(() => {
+    const map: Record<string, number> = {};
+    ACTIVE_STAGES.forEach((s) => {
+      map[s] = activeClients.filter((c) => c.stage === s).length;
+    });
+    return map;
+  }, [activeClients]);
 
   const selectedClient = selectedId
     ? clients.find((c) => c.id === selectedId)
@@ -72,29 +71,25 @@ const Bookings: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-foreground">Bookings</h1>
+        <h1 className="text-xl font-semibold text-foreground">Active Leads</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
-          {bookings.length} booking{bookings.length !== 1 ? "s" : ""} from
-          confirmed and closed deals.
+          {activeClients.length} active lead
+          {activeClients.length !== 1 ? "s" : ""} across the pipeline.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
-        <KPICard
-          label="Booking Confirmed"
-          value={confirmedCount}
-          icon={<BookCheck size={18} strokeWidth={1.5} />}
-        />
-        <KPICard
-          label="Deals Closed"
-          value={closedCount}
-          icon={<TrendingUp size={18} strokeWidth={1.5} />}
-        />
-        <KPICard
-          label="Total Value"
-          value={formatCurrency(String(totalValue))}
-          icon={<IndianRupee size={18} strokeWidth={1.5} />}
-        />
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+        {ACTIVE_STAGES.map((s) => {
+          const label = PIPELINE_STAGES.find((p) => p.id === s)?.label || s;
+          return (
+            <KPICard
+              key={s}
+              label={label}
+              value={stageCounts[s] || 0}
+              icon={<UserCheck size={18} strokeWidth={1.5} />}
+            />
+          );
+        })}
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
@@ -106,7 +101,7 @@ const Bookings: React.FC = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search bookings..."
+            placeholder="Search active leads..."
             className="pl-9 h-9 text-sm"
           />
         </div>
@@ -117,7 +112,7 @@ const Bookings: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Stages</SelectItem>
-            {BOOKING_STAGES.map((s) => (
+            {ACTIVE_STAGES.map((s) => (
               <SelectItem key={s} value={s}>
                 {PIPELINE_STAGES.find((p) => p.id === s)?.label}
               </SelectItem>
@@ -129,24 +124,31 @@ const Bookings: React.FC = () => {
       <div className="rounded-xl bg-card card-shadow overflow-hidden">
         {filtered.length === 0 ? (
           <div className="text-center py-12">
-            <BookCheck
+            <UserCheck
               size={32}
               className="mx-auto text-muted-foreground/40 mb-2"
             />
-            <p className="text-sm text-muted-foreground">No bookings found.</p>
+            <p className="text-sm text-muted-foreground">
+              No active leads found.
+            </p>
           </div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="h-10 text-xs">Client</TableHead>
-                <TableHead className="h-10 text-xs hidden sm:table-cell">
-                  Property
-                </TableHead>
                 <TableHead className="h-10 text-xs hidden md:table-cell">
                   Number
                 </TableHead>
-                <TableHead className="h-10 text-xs text-right">Value</TableHead>
+                <TableHead className="h-10 text-xs hidden lg:table-cell">
+                  Property
+                </TableHead>
+                <TableHead className="h-10 text-xs hidden lg:table-cell">
+                  Location
+                </TableHead>
+                <TableHead className="h-10 text-xs text-right">
+                  Budget
+                </TableHead>
                 <TableHead className="h-10 text-xs">Stage</TableHead>
               </TableRow>
             </TableHeader>
@@ -170,17 +172,20 @@ const Bookings: React.FC = () => {
                           <p className="text-sm font-medium text-foreground truncate">
                             {client.clientName}
                           </p>
-                          <p className="text-[11px] text-muted-foreground sm:hidden truncate">
-                            {client.interestedProperty || "—"}
+                          <p className="text-[11px] text-muted-foreground md:hidden truncate">
+                            {client.number}
                           </p>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden sm:table-cell truncate max-w-[200px]">
-                      {client.interestedProperty || "—"}
-                    </TableCell>
                     <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell">
                       {client.number}
+                    </TableCell>
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden lg:table-cell truncate max-w-[200px]">
+                      {client.interestedProperty || "—"}
+                    </TableCell>
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden lg:table-cell">
+                      {client.location || "—"}
                     </TableCell>
                     <TableCell className="py-2.5 text-sm font-mono tabular-nums text-right">
                       {formatCurrency(client.budget || "")}
@@ -208,4 +213,4 @@ const Bookings: React.FC = () => {
   );
 };
 
-export default Bookings;
+export default ActiveLeads;

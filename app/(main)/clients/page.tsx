@@ -49,11 +49,8 @@ import {
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from "@/components/ui/pagination";
 import { format } from "date-fns";
 
@@ -66,17 +63,25 @@ const Clients: React.FC = () => {
     pageDataLength,
     setCurrentPage,
     totalPages,
+    stageFilter,
+    setStageFilter,
+    totalFilteredClients,
   } = useCRM();
   const filteredClients = useFilteredClients();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [stageFilter, setStageFilter] = useState<string>("all");
+  // const [stageFilter, setStageFilter] = useState<PipelineStage | string>("all");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [deleteId, SetdeleteId] = useState("");
 
   const displayClients = useMemo(() => {
     if (stageFilter === "all") return filteredClients;
+    if (stageFilter === "active") {
+      return filteredClients.filter(
+        (c) => c.stage === "contacted" || c.stage === "deal_closed",
+      );
+    }
     return filteredClients.filter((c) => c.stage === stageFilter);
   }, [filteredClients, stageFilter]);
 
@@ -87,14 +92,14 @@ const Clients: React.FC = () => {
   const exportCSV = () => {
     const headers = [
       "Name",
-      "Email",
       "Phone",
       "Budget",
       "Property",
-      "Type",
-      "Source",
+      "Income",
+      "Location",
+      "Visit",
+      "Notes",
       "Stage",
-      "Date Added",
     ];
     const rows = displayClients.map((c) => [
       c.clientName,
@@ -105,7 +110,6 @@ const Clients: React.FC = () => {
       c.income,
       c.location,
       c.visit,
-      c.followUp,
       c.notes,
       c.stage,
     ]);
@@ -136,7 +140,7 @@ const Clients: React.FC = () => {
         <div>
           <h1 className="text-xl font-semibold text-foreground">Clients</h1>
           <p className="text-sm text-muted-foreground">
-            {displayClients.length} clients
+            {totalFilteredClients} clients
           </p>
         </div>
         <div className="flex gap-2">

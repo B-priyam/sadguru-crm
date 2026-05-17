@@ -71,7 +71,7 @@ export const loginUser = async (email: string, password: string) => {
     throw new Error("Invalid credentials");
   }
 
-  const token = generateToken(user.id);
+  const token = await generateToken(user.id);
 
   await setAuthCookie(token);
 

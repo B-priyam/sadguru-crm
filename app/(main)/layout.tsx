@@ -13,13 +13,15 @@ import {
   Moon,
   HamburgerIcon,
   MenuIcon,
+  LogOutIcon,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { syncPendingActions } from "@/actions/offline.action";
+import { logoutUser } from "@/helpers/authHelper";
 
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -27,7 +29,7 @@ const navItems = [
   { to: "/clients", label: "Clients", icon: Users },
   { to: "/properties", label: "Properties", icon: Building2 },
   { to: "/visits", label: "Visits", icon: MapPin },
-  { to: "/visits", label: "Active Clients", icon: MapPin },
+  { to: "/active-clients", label: "Active Clients", icon: MapPin },
   { to: "/bookings", label: "Bookings", icon: CalendarCheck },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
@@ -35,6 +37,7 @@ const navItems = [
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
+  const router = useRouter();
   const isOnline = useOnlineStatus();
   const [showMenu, setShowMenu] = useState(false);
 
@@ -48,6 +51,11 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (showMenu) {
       setShowMenu(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await logoutUser();
+    router.push("/login");
   };
 
   return (
@@ -87,6 +95,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             );
           })}
         </nav>
+        <nav className="px-2 space-y-0.5">
+          <div
+            className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-muted-foreground hover:bg-secondary hover:text-foreground`}
+            onClick={handleLogout}
+          >
+            <LogOutIcon size={16} strokeWidth={1.5} />
+            {"Logout"}
+          </div>
+        </nav>
         <div className="mt-auto p-4">
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -118,7 +135,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
               } ${item.label === "Pipeline" && "hidden"}`}
             >
               <item.icon size={18} strokeWidth={1.5} />
-              {item.label}
+              {item.label === "Active Clients" ? "Active" : item.label}
             </Link>
           );
         })}
@@ -132,6 +149,13 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             <Moon size={18} strokeWidth={1.5} />
           )}
           Theme
+        </button>
+        <button
+          onClick={handleLogout}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 rounded-lg text-[10px] text-muted-foreground"
+        >
+          <LogOutIcon size={18} />
+          Logout
         </button>
       </nav>
 

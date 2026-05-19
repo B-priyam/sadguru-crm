@@ -41,6 +41,7 @@ export const GetClients = async (
   pageDataLength: number,
   searchQuery: string,
   stage: string,
+  pathname: string,
 ) => {
   const userDetails = await getSession();
   if (!userDetails) {
@@ -51,6 +52,11 @@ export const GetClients = async (
     };
   }
   try {
+    // if (searchQuery.length > 1) {
+    //   stage = "all";
+    // } else {
+    //   stage = stage;
+    // }
     const whereClause: any = {
       ...(searchQuery && {
         OR: [
@@ -74,10 +80,16 @@ export const GetClients = async (
           stage: stage,
         }),
     };
-    const [fetch, totalClients] = await Promise.all([
+    const [fetch, totalClients, totalFilteredClients] = await Promise.all([
       client.client.findMany({
-        skip: (currentPage - 1) * pageDataLength,
-        take: pageDataLength,
+        skip:
+          pathname === "/active-clients" || pathname === "/bookings"
+            ? 0
+            : (currentPage - 1) * pageDataLength,
+        ...(pathname !== "/active-clients" &&
+          pathname !== "/bookings" && {
+            take: pageDataLength,
+          }),
         orderBy: {
           createdAt: "desc",
         },
@@ -85,6 +97,11 @@ export const GetClients = async (
       }),
 
       client.client.count(),
+      whereClause
+        ? client.client.findMany({
+            where: whereClause,
+          })
+        : client.client.findMany({}),
     ]);
 
     if (fetch) {
@@ -92,8 +109,9 @@ export const GetClients = async (
         success: true,
         status: 200,
         data: fetch,
-        totalPages: Math.ceil(fetch.length / pageDataLength),
+        totalPages: Math.ceil(totalFilteredClients.length / pageDataLength),
         totalClients,
+        totalFilteredClients: totalFilteredClients.length,
       };
     }
   } catch (error) {
@@ -104,6 +122,7 @@ export const GetClients = async (
       data: [],
       totalPages: 0,
       totalClients: 0,
+      totalFilteredClients: 0,
     };
   }
 };

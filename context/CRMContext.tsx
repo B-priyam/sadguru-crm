@@ -43,6 +43,7 @@ import {
   saveProperties,
 } from "@/actions/offline.action";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 
 interface CRMContextType {
   clients: Client[];
@@ -66,7 +67,7 @@ interface CRMContextType {
   setCurrentPage: (pageNumber: number) => void;
   totalClients: number | string;
   stageFilter: string;
-  setStageFilter: (stage: PipelineStage) => void;
+  setStageFilter: (stage: PipelineStage | string) => void;
   totalFilteredClients: number;
   setTotalFilteredClients: (clients: number) => void;
   debouncedSearchQuery: string;
@@ -119,33 +120,46 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
   const [stageFilter, setStageFilter] = useState("all");
   const [totalFilteredClients, setTotalFilteredClients] = useState(0);
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const pathname = usePathname();
 
   const {
     data: clientsData,
     isLoading,
     isFetching,
   } = useQuery({
-    queryKey: ["clients", currentPage, debouncedSearchQuery, stageFilter],
+    queryKey: [
+      "clients",
+      currentPage,
+      debouncedSearchQuery,
+      stageFilter,
+      pathname,
+      searchQuery,
+    ],
 
     queryFn: async () => {
       // if (navigator.onLine) {
+
       const allClients = await GetClients(
         currentPage,
         pageDataLength,
         debouncedSearchQuery,
         stageFilter,
+        pathname,
       );
 
       if (allClients?.data) {
         setTotalPages(allClients?.totalPages || 0);
 
-        await saveClients(allClients.data as unknown as Client[]);
+        // await saveClients(allClients.data as unknown as Client[]);
 
-        console.log("allClients", {
+        // console.log("allClients", {
+        //   ...allClients,
+        //   totalFilteredClients: allClients.data.length,
+        // });
+        return {
           ...allClients,
-          totalFilteredClients: allClients.data.length,
-        });
-        return { ...allClients, totalFilteredClients: allClients.data.length };
+          // totalFilteredClients: allClients.data.length,
+        };
       }
 
       return {
@@ -178,6 +192,12 @@ export const CRMProvider: React.FC<{ children: React.ReactNode }> = ({
       setTotalFilteredClients(clientsData?.totalFilteredClients || 0);
     }
   }, [clientsData]);
+
+  useEffect(() => {
+    if (searchQuery.length > 1) {
+      setStageFilter("all");
+    }
+  }, [searchQuery]);
 
   const getAllProperties = async () => {
     if (navigator.onLine) {

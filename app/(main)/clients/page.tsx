@@ -136,15 +136,20 @@ const Clients: React.FC = () => {
     }
   };
 
-  console.log();
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 400);
+    if (searchQuery.length > 1 || searchQuery.length === 0) {
+      const timer = setTimeout(() => {
+        setDebouncedSearchQuery(searchQuery);
+      }, 400);
 
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    }
   }, [searchQuery]);
+
+  const handleStageChange = (value: string) => {
+    setSearchQuery("");
+    setStageFilter(value);
+  };
 
   return (
     <div className="space-y-4">
@@ -190,7 +195,10 @@ const Clients: React.FC = () => {
             className="pl-9 h-9 text-sm"
           />
         </div>
-        <Select value={stageFilter} onValueChange={setStageFilter}>
+        <Select
+          value={stageFilter}
+          onValueChange={(value) => handleStageChange(value)}
+        >
           <SelectTrigger className="w-full sm:w-[180px] h-9 text-sm">
             <SelectValue placeholder="All Stages" />
           </SelectTrigger>

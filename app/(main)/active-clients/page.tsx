@@ -3,7 +3,11 @@
 import React, { useMemo, useState } from "react";
 import { useCRM } from "@/context/CRMContext";
 import { PIPELINE_STAGES, PipelineStage } from "@/types/crm";
-import { formatCurrency, getInitials } from "@/lib/crm-utils";
+import {
+  formatCurrency,
+  getInitials,
+  useFilteredClients,
+} from "@/lib/crm-utils";
 import { Input } from "@/components/ui/input";
 import { Search, UserCheck, Filter } from "lucide-react";
 import ClientSlideOver from "@/components/ClientSlideOver";
@@ -34,13 +38,14 @@ const ACTIVE_STAGES: PipelineStage[] = [
 
 const ActiveLeads: React.FC = () => {
   const { clients } = useCRM();
+  const filteredClients = useFilteredClients();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const activeClients = useMemo(() => {
-    return clients.filter((c) => ACTIVE_STAGES.includes(c.stage));
-  }, [clients]);
+    return filteredClients.filter((c) => ACTIVE_STAGES.includes(c.stage));
+  }, [filteredClients]);
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase();

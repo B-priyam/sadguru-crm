@@ -78,7 +78,11 @@ const Clients: React.FC = () => {
   const [deleteId, SetdeleteId] = useState("");
 
   const displayClients = useMemo(() => {
-    if (stageFilter === "all") return filteredClients;
+    if (stageFilter === "all")
+      return filteredClients
+        .filter((d) => d.stage !== "booking_confirmed")
+        .filter((d) => d.stage !== "deal_closed")
+        .filter((d) => d.stage !== "lost");
     if (stageFilter === "active") {
       return filteredClients.filter(
         (c) => c.stage === "contacted" || c.stage === "deal_closed",
@@ -204,7 +208,10 @@ const Clients: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Stages</SelectItem>
-            {PIPELINE_STAGES.map((s) => (
+            {PIPELINE_STAGES.filter(
+              (d) =>
+                !["booking_confirmed", "deal_closed", "lost"].includes(d.id),
+            ).map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.label}
               </SelectItem>

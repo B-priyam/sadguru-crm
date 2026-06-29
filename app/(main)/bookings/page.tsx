@@ -61,9 +61,11 @@ const Bookings: React.FC = () => {
   ).length;
   const closedCount = bookings.filter((b) => b.stage === "deal_closed").length;
   const totalValue = bookings.reduce(
-    (sum, b) => sum + (Number(b.budget) || 0),
+    (sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0),
     0,
   );
+
+  console.log("totalValue", bookings[0].budget);
 
   const selectedClient = selectedId
     ? clients.find((c) => c.id === selectedId)

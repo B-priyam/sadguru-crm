@@ -33,7 +33,6 @@ const ACTIVE_STAGES: PipelineStage[] = [
   "contacted",
   "site_visit",
   "negotiation",
-  "booking_confirmed",
 ];
 
 const ActiveLeads: React.FC = () => {

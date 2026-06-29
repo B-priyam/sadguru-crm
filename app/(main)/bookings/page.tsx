@@ -65,8 +65,6 @@ const Bookings: React.FC = () => {
     0,
   );
 
-  console.log("totalValue", bookings[0].budget);
-
   const selectedClient = selectedId
     ? clients.find((c) => c.id === selectedId)
     : undefined;

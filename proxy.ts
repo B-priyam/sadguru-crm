@@ -9,7 +9,9 @@ export function proxy(request: NextRequest) {
 
   // Always allow public routes
   const isPublicRoute =
-    pathname === "/login" || pathname === "/forgot-password";
+    pathname === "/login" ||
+    pathname === "/forgot-password" ||
+    pathname === "/api/webhooks/facebook";
 
   // ❌ No token → force login (for all protected routes)
   if (!token && !isPublicRoute) {

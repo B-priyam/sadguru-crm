@@ -5,7 +5,7 @@ import { CRMProvider } from "@/context/CRMContext";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/queryProvider";
 import { AuthProvider } from "@/context/AuthContext";
-import { MetaPixel } from "@/components/MetaPixel";
+// import { MetaPixel } from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,7 +40,7 @@ export default function RootLayout({
           <AuthProvider>
             <CRMProvider>
               {children}
-              <MetaPixel pixelId={pixelId} />
+              {/* <MetaPixel pixelId={pixelId} /> */}
             </CRMProvider>
           </AuthProvider>
         </QueryProvider>

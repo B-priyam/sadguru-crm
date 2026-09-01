@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useCRM } from "@/context/CRMContext";
 import { PIPELINE_STAGES, PipelineStage } from "@/types/crm";
 import { formatCurrency, getInitials } from "@/lib/crm-utils";
@@ -29,6 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { isSameMonth } from "date-fns";
 
 const BOOKING_STAGES: PipelineStage[] = ["booking_confirmed", "deal_closed"];
 
@@ -37,6 +38,7 @@ const Bookings: React.FC = () => {
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [brokerageRate, setBrokerageRate] = useState(3);
 
   const bookings = useMemo(
     () => clients.filter((c) => BOOKING_STAGES.includes(c.stage)),
@@ -58,12 +60,28 @@ const Bookings: React.FC = () => {
 
   const confirmedCount = bookings.filter(
     (b) => b.stage === "booking_confirmed",
-  ).length;
-  const closedCount = bookings.filter((b) => b.stage === "deal_closed").length;
-  const totalValue = bookings.reduce(
+  );
+
+  const closedCount = bookings.filter((b) => b.stage === "deal_closed");
+  const totalValue = filtered.reduce(
     (sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0),
     0,
   );
+  const totalMothlyValue = filtered
+    .filter(
+      (d) => d.bookingDate && isSameMonth(new Date(d.bookingDate), new Date()),
+    )
+    .reduce((sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0), 0);
+
+  const totalBrokerage = filtered.reduce(
+    (sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0),
+    0,
+  );
+  const totalMothlyBrokerage = filtered
+    .filter(
+      (d) => d.bookingDate && isSameMonth(new Date(d.bookingDate), new Date()),
+    )
+    .reduce((sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0), 0);
 
   const selectedClient = selectedId
     ? clients.find((c) => c.id === selectedId)
@@ -82,17 +100,43 @@ const Bookings: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
         <KPICard
           label="Booking Confirmed"
-          value={confirmedCount}
+          value2={confirmedCount.length}
           icon={<BookCheck size={18} strokeWidth={1.5} />}
+          subtitle="Month"
+          value={
+            confirmedCount?.filter(
+              (d) =>
+                d.bookingDate &&
+                isSameMonth(new Date(d.bookingDate), new Date()),
+            ).length
+          }
+          subtitle2="Total"
         />
         <KPICard
           label="Deals Closed"
-          value={closedCount}
+          subtitle2="Total"
+          value2={closedCount.length}
           icon={<TrendingUp size={18} strokeWidth={1.5} />}
+          value={
+            closedCount?.filter(
+              (d) =>
+                d.bookingDate &&
+                isSameMonth(new Date(d.bookingDate), new Date()),
+            ).length
+          }
+          subtitle="Month"
         />
         <KPICard
           label="Total Value"
-          value={formatCurrency(String(totalValue))}
+          value2={formatCurrency(String(totalValue))}
+          subtitle="Month"
+          icon={<IndianRupee size={18} strokeWidth={1.5} />}
+          value={formatCurrency(String(totalMothlyValue))}
+          subtitle2="Total"
+        />
+        <KPICard
+          label="Total Value"
+          value={formatCurrency(String(totalBrokerage))}
           icon={<IndianRupee size={18} strokeWidth={1.5} />}
         />
       </div>
@@ -147,6 +191,10 @@ const Bookings: React.FC = () => {
                   Number
                 </TableHead>
                 <TableHead className="h-10 text-xs text-right">Value</TableHead>
+                <TableHead className="h-10 text-xs text-right">Rate</TableHead>
+                <TableHead className="h-10 text-xs text-right">
+                  Brokerage
+                </TableHead>
                 <TableHead className="h-10 text-xs">Stage</TableHead>
               </TableRow>
             </TableHeader>
@@ -185,9 +233,32 @@ const Bookings: React.FC = () => {
                     <TableCell className="py-2.5 text-sm font-mono tabular-nums text-right">
                       {formatCurrency(client.budget || "")}
                     </TableCell>
-                    <TableCell className="py-2.5">
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell ">
+                      <Input
+                        type="number"
+                        value={brokerageRate}
+                        onChange={(e) => {
+                          e.preventDefault();
+                          setBrokerageRate(Number(e.target.value));
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell">
+                      {formatCurrency(
+                        String(
+                          Number(client.budget?.replaceAll(",", "")) *
+                            Number(brokerageRate / 100),
+                        ),
+                      )}
+                    </TableCell>
+                    <TableCell className="py-2.5 hidden md:inline">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded whitespace-nowrap">
                         {stageLabel}
+                      </span>
+                    </TableCell>
+                    <TableCell className="py-2.5 md:hidden">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded whitespace-nowrap">
+                        {getInitials(stageLabel!)}
                       </span>
                     </TableCell>
                   </TableRow>

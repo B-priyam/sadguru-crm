@@ -103,6 +103,13 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   const [showAddProperty, setShowAddProperty] = useState(false);
   const [newPropertyName, setNewPropertyName] = useState("");
 
+  const [bookingDate, setBookingDate] = useState<Date | undefined>(
+    existing?.bookingDate ? new Date(existing.bookingDate) : undefined,
+  );
+  const [agreementValue, setAgreementValue] = useState(
+    existing?.agreementValue || "",
+  );
+
   const selectedProperty = useMemo(() => {
     return properties.find((p) => p.id === selectedPropertyId);
   }, [properties, selectedPropertyId]);
@@ -123,6 +130,13 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
       d.setHours(h, m, 0, 0);
       visitDateISO = d.toISOString();
     }
+    let bookingDateISO: string | undefined;
+    if (visit) {
+      const [h, m] = visitTime.split(":").map(Number);
+      const d = new Date(visit);
+      d.setHours(h, m, 0, 0);
+      bookingDateISO = d.toISOString();
+    }
 
     const propertyName = selectedProperty?.name || "";
 
@@ -141,6 +155,8 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         income,
         residence,
         propertyArea,
+        agreementValue,
+        bookingDate: bookingDateISO,
       });
     } else {
       addClient({
@@ -161,6 +177,8 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         propertyArea,
         notes: note ? [{ text: note, createdAt: new Date(Date.now()) }] : [],
         followUp: [],
+        agreementValue,
+        bookingDate: bookingDateISO,
       });
     }
     onClose();
@@ -196,6 +214,8 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
       visit: setVisit,
       visitTime: setVisitTime,
       note: setNote,
+      bookingDate: setBookingDate,
+      agreementValue: setAgreementValue,
     }),
     [],
   );
@@ -447,6 +467,58 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                Booking Date
+              </label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-9 text-sm mt-1 justify-start text-left font-normal",
+                      !bookingDate && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-3.5 w-3.5" />
+                    {bookingDate ? format(bookingDate, "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={bookingDate}
+                    onSelect={setBookingDate}
+                    initialFocus
+                    className={cn("p-3 pointer-events-auto")}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div>
+              <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                Agreement Value
+              </label>
+              <Input
+                type="text"
+                value={agreementValue}
+                onChange={(e) => {
+                  const formatted = Number(
+                    e.target.value.replaceAll(",", ""),
+                  ).toLocaleString("en-IN");
+                  if (e.target.value === "") {
+                    setAgreementValue("");
+                  } else {
+                    setAgreementValue(formatted.toString());
+                  }
+                }}
+                className="h-9 text-sm mt-1"
+                placeholder="50,000"
+                name="income"
+              />
             </div>
           </div>
 

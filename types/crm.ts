@@ -119,6 +119,8 @@ export interface Client {
   // lastContact: string;
   visit?: string;
   // booking?: Booking;
+  bookingDate?: string;
+  agreementValue?: string;
   followUp: FollowUp[];
   income?: string;
   location?: string;
@@ -138,4 +140,6 @@ export type FormFields =
   | "stage"
   | "visit"
   | "visitTime"
+  | "bookingDate"
+  | "agreementValue"
   | "note";

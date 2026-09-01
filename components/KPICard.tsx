@@ -4,6 +4,8 @@ interface KPICardProps {
   label: string;
   value: string | number;
   subtitle?: string;
+  value2?: string | number;
+  subtitle2?: string;
   icon: React.ReactNode;
   onClick?: () => void;
 }
@@ -13,6 +15,8 @@ const KPICard: React.FC<KPICardProps> = ({
   value,
   subtitle,
   icon,
+  value2,
+  subtitle2,
   onClick,
 }) => (
   <div
@@ -24,14 +28,28 @@ const KPICard: React.FC<KPICardProps> = ({
         <p className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-medium truncate">
           {label}
         </p>
-        <p className="text-lg sm:text-xl font-semibold text-foreground mt-0.5 sm:mt-1 tabular-nums truncate">
-          {value}
-        </p>
-        {subtitle && (
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
-            {subtitle}
-          </p>
-        )}
+        <div className="flex justify-between items-center">
+          <div>
+            {subtitle && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+                {subtitle}
+              </p>
+            )}
+            <p className="text-lg sm:text-xl font-semibold text-foreground mt-0.5 sm:mt-1 tabular-nums truncate">
+              {value}
+            </p>
+          </div>
+          <div>
+            {subtitle2 && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5 truncate">
+                {subtitle2}
+              </p>
+            )}
+            <p className="text-lg sm:text-xl font-semibold text-foreground mt-0.5 sm:mt-1 tabular-nums truncate">
+              {value2}
+            </p>
+          </div>
+        </div>
       </div>
       <div className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
         {icon}

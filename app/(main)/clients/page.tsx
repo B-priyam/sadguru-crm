@@ -208,9 +208,7 @@ const Clients: React.FC = () => {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Stages</SelectItem>
-            {PIPELINE_STAGES.filter(
-              (d) => !["booking_confirmed", "deal_closed"].includes(d.id),
-            ).map((s) => (
+            {PIPELINE_STAGES.filter((d) => ![""].includes(d.id)).map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.label}
               </SelectItem>

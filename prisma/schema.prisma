@@ -38,6 +38,8 @@ model Client {
   notes              Json?
   propertyArea       String?
   userId             String
+  bookingDate        String?
+  agreementValue     String?
   user               User?     @relation(fields: [userId], references: [id])
 }
 
@@ -70,5 +72,7 @@ model RecentlyDeleted {
   notes              Json?
   propertyArea       String?
   userId             String?
+  bookingDate        String?
+  agreementValue     String?
   user               User?     @relation(fields: [userId], references: [id])
 }

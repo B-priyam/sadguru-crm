@@ -5,6 +5,7 @@ import { CRMProvider } from "@/context/CRMContext";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/queryProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import { MetaPixel } from "@/components/MetaPixel";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID!;
   return (
     <html
       lang="en"
@@ -36,7 +38,10 @@ export default function RootLayout({
         <Toaster />
         <QueryProvider>
           <AuthProvider>
-            <CRMProvider>{children}</CRMProvider>
+            <CRMProvider>
+              {children}
+              <MetaPixel pixelId={pixelId} />
+            </CRMProvider>
           </AuthProvider>
         </QueryProvider>
       </body>

@@ -34,7 +34,7 @@ import { isSameMonth } from "date-fns";
 const BOOKING_STAGES: PipelineStage[] = ["booking_confirmed", "deal_closed"];
 
 const Bookings: React.FC = () => {
-  const { clients } = useCRM();
+  const { clients, properties } = useCRM();
   const [query, setQuery] = useState("");
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -74,14 +74,25 @@ const Bookings: React.FC = () => {
     .reduce((sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0), 0);
 
   const totalBrokerage = filtered.reduce(
-    (sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0),
+    (sum, b) =>
+      sum +
+      ((Number(b.agreementValue?.replaceAll(",", "")) *
+        Number(b?.brokerageRate || 3)) /
+        100 || 0),
     0,
   );
+
   const totalMothlyBrokerage = filtered
     .filter(
       (d) => d.bookingDate && isSameMonth(new Date(d.bookingDate), new Date()),
     )
-    .reduce((sum, b) => sum + (Number(b.budget?.replaceAll(",", "")) || 0), 0);
+    .reduce(
+      (sum, b) =>
+        sum +
+        (Number(b.agreementValue?.replaceAll(",", "")) *
+          Number(b?.brokerageRate || 3) || 0),
+      0,
+    );
 
   const selectedClient = selectedId
     ? clients.find((c) => c.id === selectedId)
@@ -136,7 +147,10 @@ const Bookings: React.FC = () => {
         />
         <KPICard
           label="Total Value"
-          value={formatCurrency(String(totalBrokerage))}
+          subtitle2="Total"
+          value2={formatCurrency(String(totalBrokerage))}
+          subtitle="Month"
+          value={formatCurrency(String(totalMothlyBrokerage))}
           icon={<IndianRupee size={18} strokeWidth={1.5} />}
         />
       </div>
@@ -183,19 +197,23 @@ const Bookings: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="h-10 text-xs">Client</TableHead>
+                <TableHead className="h-10 text-xs text-center">
+                  Client
+                </TableHead>
                 <TableHead className="h-10 text-xs hidden sm:table-cell">
                   Property
                 </TableHead>
-                <TableHead className="h-10 text-xs hidden md:table-cell">
+                <TableHead className="h-10 text-xs hidden md:table-cell ">
                   Number
                 </TableHead>
-                <TableHead className="h-10 text-xs text-right">Value</TableHead>
-                <TableHead className="h-10 text-xs text-right">Rate</TableHead>
-                <TableHead className="h-10 text-xs text-right">
+                <TableHead className="h-10 text-xs text-center">
+                  Value
+                </TableHead>
+                <TableHead className="h-10 text-xs text-center">Rate</TableHead>
+                <TableHead className="h-10 text-xs text-center">
                   Brokerage
                 </TableHead>
-                <TableHead className="h-10 text-xs">Stage</TableHead>
+                <TableHead className="h-10 text-xs ">Stage</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -230,24 +248,18 @@ const Bookings: React.FC = () => {
                     <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell">
                       {client.number}
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm font-mono tabular-nums text-right">
-                      {formatCurrency(client.budget || "")}
+                    <TableCell className="py-2.5 text-sm font-mono tabular-nums text-center">
+                      {formatCurrency(client?.agreementValue || "NA")}
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell ">
-                      <Input
-                        type="number"
-                        value={brokerageRate}
-                        onChange={(e) => {
-                          e.preventDefault();
-                          setBrokerageRate(Number(e.target.value));
-                        }}
-                      />
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell text-center">
+                      {`${client?.brokerageRate ? client?.brokerageRate : "3"}%`}
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell">
+                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell text-center">
                       {formatCurrency(
                         String(
-                          Number(client.budget?.replaceAll(",", "")) *
-                            Number(brokerageRate / 100),
+                          (Number(client.agreementValue?.replaceAll(",", "")) *
+                            Number(client?.brokerageRate)) /
+                            100,
                         ),
                       )}
                     </TableCell>

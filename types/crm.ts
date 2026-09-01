@@ -125,6 +125,7 @@ export interface Client {
   income?: string;
   location?: string;
   occupation?: string;
+  brokerageRate?: string;
   residence?: string;
 }
 
@@ -142,4 +143,5 @@ export type FormFields =
   | "visitTime"
   | "bookingDate"
   | "agreementValue"
+  | "brokerageRate"
   | "note";

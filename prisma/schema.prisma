@@ -40,6 +40,7 @@ model Client {
   userId             String
   bookingDate        String?
   agreementValue     String?
+  brokerageRate      String?
   user               User?     @relation(fields: [userId], references: [id])
 }
 
@@ -74,5 +75,6 @@ model RecentlyDeleted {
   userId             String?
   bookingDate        String?
   agreementValue     String?
+  brokerageRate      String?
   user               User?     @relation(fields: [userId], references: [id])
 }

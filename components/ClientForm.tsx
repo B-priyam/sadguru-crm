@@ -110,6 +110,10 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     existing?.agreementValue || "",
   );
 
+  const [brokerageRate, setBrokerageRate] = useState(
+    existing?.brokerageRate || "",
+  );
+
   const selectedProperty = useMemo(() => {
     return properties.find((p) => p.id === selectedPropertyId);
   }, [properties, selectedPropertyId]);
@@ -157,6 +161,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         propertyArea,
         agreementValue,
         bookingDate: bookingDateISO,
+        brokerageRate,
       });
     } else {
       addClient({
@@ -179,6 +184,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         followUp: [],
         agreementValue,
         bookingDate: bookingDateISO,
+        brokerageRate,
       });
     }
     onClose();
@@ -216,6 +222,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
       note: setNote,
       bookingDate: setBookingDate,
       agreementValue: setAgreementValue,
+      brokerageRate: setBudget,
     }),
     [],
   );
@@ -344,27 +351,36 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 name="number"
               />
             </div>
-            <div>
+            <div className="relative">
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                Income
+                Brokerage Rate
               </label>
               <Input
                 type="text"
-                value={income}
+                value={brokerageRate}
                 onChange={(e) => {
-                  const formatted = Number(
-                    e.target.value.replaceAll(",", ""),
-                  ).toLocaleString("en-IN");
+                  const formatted = Number(e.target.value.replaceAll("%", ""));
                   if (e.target.value === "") {
-                    setIncome("");
+                    setBrokerageRate("");
                   } else {
-                    setIncome(formatted.toString());
+                    setBrokerageRate(formatted.toString());
                   }
                 }}
                 className="h-9 text-sm mt-1"
-                placeholder="50,000"
-                name="income"
+                placeholder="3"
+                name="brokerageRate"
               />
+              <span
+                style={{
+                  position: "absolute",
+                  right: "10px",
+                  // top: "50%",
+                  bottom: "10%",
+                  // transform: "translateY(-50%)",
+                }}
+              >
+                %
+              </span>
             </div>
             <div>
               <label className="text-[10px] text-muted-foreground uppercase tracking-wider">

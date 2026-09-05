@@ -30,6 +30,8 @@ const Login: React.FC = () => {
       if (loginRes.user) {
         toast.success("Logged In successfully");
         router.push("/");
+      } else {
+        toast.error(loginRes?.message);
       }
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");

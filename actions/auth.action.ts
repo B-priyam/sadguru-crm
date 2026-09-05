@@ -62,13 +62,19 @@ export const loginUser = async (email: string, password: string) => {
   });
 
   if (!user) {
-    throw new Error("Invalid credentials");
+    return {
+      status: 400,
+      message: "Invalid credentials",
+    };
   }
 
   const isPasswordCorrect = await comparePassword(password, user.password);
 
   if (!isPasswordCorrect) {
-    throw new Error("Invalid credentials");
+    return {
+      status: 401,
+      message: "Invalid credentials",
+    };
   }
 
   const token = await generateToken(user.id);

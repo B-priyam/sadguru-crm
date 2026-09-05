@@ -25,6 +25,7 @@ import {
   Cell,
 } from "recharts";
 import { useRouter } from "next/navigation";
+import { isSameMonth } from "date-fns";
 
 const STAGE_COLORS = [
   "hsl(161,94%,30%)",
@@ -40,21 +41,26 @@ const Dashboard: React.FC = () => {
   const { clients, totalClients } = useCRM();
   const router = useRouter();
 
+  const currentMonthClients = clients.map((d) =>
+    isSameMonth(new Date(d.createdAt!), new Date()),
+  );
+
   const stats = useMemo(() => {
     const activeLeads = clients.filter(
-      (c) => !["deal_closed", "lost"].includes(c.stage),
+      (c) => !["deal_closed", "lost", "booking_confirmed"].includes(c.stage),
+    ).length;
+    const currentMonthActiveLeads = clients.filter(
+      (c) =>
+        !["deal_closed", "lost", "booking_confirmed"].includes(c.stage) &&
+        isSameMonth(new Date(c.createdAt!), new Date()),
     ).length;
     const bookingsConfirmed = clients.filter(
       (c) => c.stage === "booking_confirmed",
     ).length;
-    const dealsClosed = clients.filter((c) => c.stage === "deal_closed").length;
-    // const revenue = clients.reduce(
-    //   (sum, c) => sum + (c.booking?.commissionEarned || 0),
-    //   0,
-    // );
+    const dealsClosed = clients.filter((c) => c.stage === "deal_closed");
     const conversionRate =
       Number(totalClients) > 0
-        ? Math.round((dealsClosed / Number(totalClients)) * 100)
+        ? Math.round((dealsClosed.length / Number(totalClients)) * 100)
         : 0;
     return {
       totalClients,
@@ -63,6 +69,8 @@ const Dashboard: React.FC = () => {
       dealsClosed,
       // revenue,
       conversionRate,
+      currentMonthClients,
+      currentMonthActiveLeads,
     };
   }, [clients]);
 
@@ -101,24 +109,37 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-2 sm:gap-3">
         <KPICard
           label="Total Clients"
-          value={stats.totalClients}
+          value2={stats.totalClients}
           onClick={() => router.push("/clients")}
           icon={<Users size={18} strokeWidth={1.5} />}
+          pointer
+          subtitle2="Total"
+          subtitle="Month"
+          value={currentMonthClients.length}
         />
         <KPICard
           label="Active Leads"
-          value={stats.activeLeads}
+          value2={stats.activeLeads}
           icon={<UserCheck size={18} strokeWidth={1.5} />}
+          onClick={() => router.push("/active-clients")}
+          pointer
+          value={stats.currentMonthActiveLeads}
+          subtitle2="Total"
+          subtitle="Month"
         />
         <KPICard
           label="Bookings"
           value={stats.bookingsConfirmed}
+          onClick={() => router.push("/bookings")}
           icon={<CalendarCheck size={18} strokeWidth={1.5} />}
+          pointer
         />
         <KPICard
           label="Deals Closed"
-          value={stats.dealsClosed}
+          value={stats.dealsClosed.length}
+          onClick={() => router.push("/bookings?activeTabs=deal_closed")}
           icon={<Handshake size={18} strokeWidth={1.5} />}
+          pointer
         />
         {/* <KPICard
           label="Revenue"

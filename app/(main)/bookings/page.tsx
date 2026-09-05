@@ -30,6 +30,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { isSameMonth } from "date-fns";
+import { useSearchParams } from "next/navigation";
 
 const BOOKING_STAGES: PipelineStage[] = ["booking_confirmed", "deal_closed"];
 
@@ -39,6 +40,15 @@ const Bookings: React.FC = () => {
   const [stageFilter, setStageFilter] = useState<string>("all");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [brokerageRate, setBrokerageRate] = useState(3);
+  const searchParams = useSearchParams();
+  const activeTabs = searchParams.get("activeTabs");
+
+  useEffect(() => {
+    if (activeTabs) {
+      console.log("activeTabs", activeTabs);
+      setStageFilter(activeTabs);
+    }
+  }, [activeTabs]);
 
   const bookings = useMemo(
     () => clients.filter((c) => BOOKING_STAGES.includes(c.stage)),
@@ -251,17 +261,21 @@ const Bookings: React.FC = () => {
                     <TableCell className="py-2.5 text-sm font-mono tabular-nums text-center">
                       {formatCurrency(client?.agreementValue || "NA")}
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell text-center">
+                    <TableCell className="py-2.5 text-sm text-muted-foreground text-center">
                       {`${client?.brokerageRate ? client?.brokerageRate : "3"}%`}
                     </TableCell>
-                    <TableCell className="py-2.5 text-sm text-muted-foreground hidden md:table-cell text-center">
-                      {formatCurrency(
-                        String(
-                          (Number(client.agreementValue?.replaceAll(",", "")) *
-                            Number(client?.brokerageRate)) /
-                            100,
-                        ),
-                      )}
+                    <TableCell className="py-2.5 text-sm text-muted-foreground text-center">
+                      {client?.agreementValue
+                        ? formatCurrency(
+                            String(
+                              (Number(
+                                client.agreementValue?.replaceAll(",", ""),
+                              ) *
+                                Number(client?.brokerageRate)) /
+                                100,
+                            ),
+                          )
+                        : "₹" + 0}
                     </TableCell>
                     <TableCell className="py-2.5 hidden md:inline">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded whitespace-nowrap">

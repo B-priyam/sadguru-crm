@@ -127,6 +127,7 @@ export interface Client {
   occupation?: string;
   brokerageRate?: string;
   residence?: string;
+  createdAt?: string;
 }
 
 export type FormFields =

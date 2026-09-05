@@ -8,6 +8,7 @@ interface KPICardProps {
   subtitle2?: string;
   icon: React.ReactNode;
   onClick?: () => void;
+  pointer?: boolean;
 }
 
 const KPICard: React.FC<KPICardProps> = ({
@@ -18,9 +19,10 @@ const KPICard: React.FC<KPICardProps> = ({
   value2,
   subtitle2,
   onClick,
+  pointer,
 }) => (
   <div
-    className="rounded-xl bg-card p-3 sm:p-4 card-shadow transition-all duration-200 ease-snap hover:card-shadow-hover"
+    className={`rounded-xl bg-card p-3 sm:p-4 card-shadow transition-all duration-200 ease-snap hover:card-shadow-hover ${pointer && "cursor-pointer"}`}
     onClick={onClick}
   >
     <div className="flex items-start justify-between gap-2 w-full">

@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  FormEvent,
+} from "react";
 import { useCRM } from "@/context/CRMContext";
 import {
   PropertyType,
@@ -29,6 +35,17 @@ import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import debounce from "lodash.debounce";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
+import { toast } from "sonner";
 
 interface Props {
   clientId?: string | null;
@@ -59,6 +76,8 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     useCRM();
   const existing = clientId ? clients.find((c) => c.id === clientId) : null;
 
+  const [openAddtextDialog, setOpenAddtextDialog] = useState(false);
+  const [textData, setTextData] = useState("");
   const [clientName, setClientName] = useState(existing?.clientName || "");
   const [number, setNumber] = useState(existing?.number || "");
   const [budget, setBudget] = useState(existing?.budget || "");
@@ -122,6 +141,33 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   //   if (!selectedProperty || !selectedUnitType) return null;
   //   return selectedProperty.units.find((u) => u.type === selectedUnitType);
   // }, [selectedProperty, selectedUnitType]);
+
+  const extractTextData = async () => {
+    if (!textData.trim()) {
+      toast.error("Kindly enter something in text field");
+    }
+    let name = textData.split("Full Name:")[1].trim();
+    let phoneNumber = textData
+      .split("Phone Number:")[1]
+      .split("I")[0]
+      .replace("\n", "")
+      .trim();
+    let campaignName = textData
+      .split("Campaign:")[1]
+      .split("Adset")[0]
+      .replaceAll("\n", "")
+      .trim();
+    let propertyType = textData.split("I Am Looking For :")[1];
+    if (campaignName == "New Sunteck - Leads campaign") {
+      setSelectedPropertyId(
+        properties.filter((d) => d.name == "Sunteck OneWorld/ Ultra ")[0].id!,
+      );
+    }
+    setClientName(name);
+    setNumber(phoneNumber);
+
+    setOpenAddtextDialog(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -304,6 +350,10 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
           <h2 className="text-sm font-semibold text-foreground">
             {existing ? "Edit Client" : "Add New Client"}
           </h2>
+          <Button onClick={() => setOpenAddtextDialog(true)}>
+            + Use TextData
+          </Button>
+          {/* <Textarea className="fixed bg-red-400 w-full h-full ">Hello</Textarea> */}
           <button
             onClick={onClose}
             className="h-8 w-8 rounded-lg flex items-center justify-center hover:bg-secondary transition-colors"
@@ -769,6 +819,28 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
             </Button>
           </div>
         </form>
+        <Dialog open={openAddtextDialog} onOpenChange={setOpenAddtextDialog}>
+          <form>
+            <DialogContent className="m-0">
+              <DialogHeader>
+                <DialogTitle></DialogTitle>
+                <DialogDescription>
+                  Enter the text to extract client data.
+                </DialogDescription>
+              </DialogHeader>
+              <Textarea
+                className="w-full min-h-28"
+                value={textData}
+                onChange={(e) => setTextData(e.target.value)}
+              />
+              <DialogFooter>
+                <Button onClick={extractTextData} type="submit">
+                  Extract Data
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </form>
+        </Dialog>
       </motion.div>
     </div>
   );

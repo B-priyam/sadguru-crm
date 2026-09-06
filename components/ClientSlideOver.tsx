@@ -11,12 +11,31 @@ import {
   CheckCircle2,
   Circle,
   Trash2,
+  PhoneCall,
+  MessageCircle,
+  Pen,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+
+import { Label } from "./ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import {
+  createTemplate,
+  deleteTemplate,
+  EditTemplate,
+} from "@/actions/template.action";
+import { toast } from "sonner";
+import ContactClient from "./ContactClient";
 
 interface Props {
   client: Client;
@@ -208,6 +227,8 @@ const ClientSlideOver: React.FC<Props> = ({ client, onClose }) => {
                     ))}
                   </div>
                 </div>
+
+                <ContactClient client={client} />
 
                 {/* {client.booking && (
                   <div className="rounded-lg bg-primary/5 p-3 space-y-2">

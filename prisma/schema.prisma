@@ -78,3 +78,10 @@ model RecentlyDeleted {
   brokerageRate      String?
   user               User?     @relation(fields: [userId], references: [id])
 }
+
+model Template {
+  id           String  @id @default(uuid())
+  templateName String
+  templateText String
+  position     String?
+}

@@ -130,6 +130,13 @@ export interface Client {
   createdAt?: string;
 }
 
+export interface Template {
+  id?: string;
+  templateName: string;
+  templateText: string;
+  position?: string | null;
+}
+
 export type FormFields =
   | "clientName"
   | "number"

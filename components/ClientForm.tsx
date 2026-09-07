@@ -174,20 +174,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         properties.filter((d) => d.name == "Sunteck OneWorld/ Ultra ")[0].id!,
       );
     }
-    setClientName(result.name);
-    setNumber(result.number);
-    setAgreementValue("");
-    setBookingDate(undefined);
-    setBudget("");
-    setIncome("");
-    setLocation("");
-    setOccupation("");
-    setResidence("");
-    setBookingDate(undefined);
-    setVisit(undefined);
-    setVisitTime("");
-    setNote("");
-    setTextData("");
+    resetForm();
 
     setOpenAddtextDialog(false);
   };
@@ -256,6 +243,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         brokerageRate,
       });
     }
+    resetForm(true);
     onClose();
   };
 
@@ -295,6 +283,27 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
     }),
     [],
   );
+
+  function resetForm(created?: boolean) {
+    if (created) {
+      setClientName("");
+      setNumber("");
+      setSelectedPropertyId("");
+    }
+    setAgreementValue("");
+    setBookingDate(undefined);
+    setBudget("");
+    setIncome("");
+    setLocation("");
+    setOccupation("");
+    setResidence("");
+    setBookingDate(undefined);
+    setVisit(undefined);
+    setVisitTime("");
+    setNote("");
+    setTextData("");
+    setBrokerageRate("");
+  }
 
   const debouncedSave = useMemo(
     () =>

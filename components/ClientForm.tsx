@@ -142,29 +142,52 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
   //   return selectedProperty.units.find((u) => u.type === selectedUnitType);
   // }, [selectedProperty, selectedUnitType]);
 
-  const extractTextData = async () => {
+  const extractTextData = () => {
     if (!textData.trim()) {
       toast.error("Kindly enter something in text field");
     }
-    let name = textData.split("Full Name:")[1].trim();
-    let phoneNumber = textData
-      .split("Phone Number:")[1]
-      .split("I")[0]
-      .replace("\n", "")
-      .trim();
-    let campaignName = textData
-      .split("Campaign:")[1]
-      .split("Adset")[0]
-      .replaceAll("\n", "")
-      .trim();
-    let propertyType = textData.split("I Am Looking For :")[1];
-    if (campaignName == "New Sunteck - Leads campaign") {
+    const result = {
+      name: "",
+      number: "",
+      campaign: "",
+    };
+
+    // Extract Full Name
+    const nameMatch = textData.match(/Full\s*Name\s*:\s*(.+?)(?=\r?\n|$)/i);
+    if (nameMatch) {
+      result.name = nameMatch[1].trim();
+    }
+
+    // Extract Phone Number
+    const phoneMatch = textData.match(/Phone\s*Number\s*:\s*([+\d\s()-]+)/i);
+    if (phoneMatch) {
+      result.number = phoneMatch[1].trim();
+    }
+
+    // Extract Campaign
+    const campaignMatch = textData.match(/Campaign\s*:\s*(.+?)(?=\r?\n|$)/i);
+    if (campaignMatch) {
+      result.campaign = campaignMatch[1].trim();
+    }
+    if (result.campaign == "New Sunteck - Leads campaign - Campaign 2") {
       setSelectedPropertyId(
         properties.filter((d) => d.name == "Sunteck OneWorld/ Ultra ")[0].id!,
       );
     }
-    setClientName(name);
-    setNumber(phoneNumber);
+    setClientName(result.name);
+    setNumber(result.number);
+    setAgreementValue("");
+    setBookingDate(undefined);
+    setBudget("");
+    setIncome("");
+    setLocation("");
+    setOccupation("");
+    setResidence("");
+    setBookingDate(undefined);
+    setVisit(undefined);
+    setVisitTime("");
+    setNote("");
+    setTextData("");
 
     setOpenAddtextDialog(false);
   };
@@ -832,6 +855,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
                 className="w-full min-h-28"
                 value={textData}
                 onChange={(e) => setTextData(e.target.value)}
+                placeholder="Paste the lead data"
               />
               <DialogFooter>
                 <Button onClick={extractTextData} type="submit">

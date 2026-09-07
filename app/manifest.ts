@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
-
 export default function manifest(): MetadataRoute.Manifest {
   return {
+    id: "/",
     name: "Sadguru CRM",
     short_name: "CRM",
     description: "Sadguru CRM Progressive Web App",
@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#000000",
-    orientation: "portrait",
+    orientation: "portrait-primary",
     icons: [
       {
         src: "/sd-logo-192.png",

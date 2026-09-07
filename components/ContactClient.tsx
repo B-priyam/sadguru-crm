@@ -35,6 +35,15 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Props {
   client: Client;
@@ -186,6 +195,14 @@ const ContactClient: React.FC<Props> = ({ client }) => {
     }
   };
 
+  const handleCopyText = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("text copied", {
+      description: "paste anywhere in the textbox",
+      duration: 1000,
+    });
+  };
+
   useEffect(() => {
     getAllTemplates();
   }, []);
@@ -285,12 +302,31 @@ const ContactClient: React.FC<Props> = ({ client }) => {
             id="templateName"
             placeholder="Followup message"
           />
-          {/* <div className="flex justify-between -mb-3"> */}
-          <Label htmlFor="templateText">Template Text</Label>
-          {/* <Button variant={"link"} className="py-0">
-                Select Placeholders
-              </Button> */}
-          {/* </div> */}
+          <div className="flex justify-between -mb-3">
+            <Label htmlFor="templateText">Template Text</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant={"link"} className="py-0">
+                  Select Placeholders
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    onClick={() => handleCopyText("[CLIENT_NAME]")}
+                  >
+                    [CLIENT_NAME]
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleCopyText("[PROPERTY_NAME]")}
+                  >
+                    [PROPERTY_NAME]
+                  </DropdownMenuItem>
+                  {/* <DropdownMenuItem>Billing</DropdownMenuItem> */}
+                </DropdownMenuGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <Textarea
             value={templateText}
             className="min-h-32"

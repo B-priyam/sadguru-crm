@@ -72,7 +72,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         >
           <div className="p-4">
             <h1 className="text-sm font-bold text-primary tracking-tight">
-              EstateFlow
+              The Sadguru
             </h1>
             <p className="text-[10px] text-muted-foreground">Real Estate CRM</p>
           </div>

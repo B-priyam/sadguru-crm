@@ -64,7 +64,9 @@ const Login: React.FC = () => {
               <Building2 size={20} strokeWidth={2} />
             </div>
             <div>
-              <h1 className="text-base font-bold tracking-tight">EstateFlow</h1>
+              <h1 className="text-base font-bold tracking-tight">
+                The Sadguru
+              </h1>
               <p className="text-[10px] opacity-80">Real Estate CRM</p>
             </div>
           </div>
@@ -95,7 +97,7 @@ const Login: React.FC = () => {
           </div>
 
           <p className="text-xs opacity-70">
-            © 2026 EstateFlow. All rights reserved.
+            © 2026 The Sadguru. All rights reserved.
           </p>
         </div>
       </div>
@@ -110,7 +112,7 @@ const Login: React.FC = () => {
             </div>
             <div>
               <h1 className="text-base font-bold text-primary tracking-tight">
-                EstateFlow
+                The Sadguru
               </h1>
               <p className="text-[10px] text-muted-foreground">
                 Real Estate CRM

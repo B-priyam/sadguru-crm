@@ -174,7 +174,7 @@ const ClientForm: React.FC<Props> = ({ clientId, onClose }) => {
         properties.filter((d) => d.name == "Sunteck OneWorld/ Ultra ")[0].id!,
       );
     }
-    resetForm();
+    resetForm(false);
 
     setOpenAddtextDialog(false);
   };

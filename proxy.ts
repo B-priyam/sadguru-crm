@@ -11,7 +11,8 @@ export function proxy(request: NextRequest) {
   const isPublicRoute =
     pathname === "/login" ||
     pathname === "/forgot-password" ||
-    pathname === "/api/webhooks/facebook";
+    pathname === "/api/webhooks/facebook" ||
+    pathname === "/api/fb-webhook";
 
   // Never protect PWA/static resources
   const isPWAResource =
@@ -56,5 +57,6 @@ export const config = {
     "/login",
     "/forgot-password",
     "/api/webhooks/facebook",
+    "/api/fb-webhook",
   ],
 };

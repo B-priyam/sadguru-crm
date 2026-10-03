@@ -5,6 +5,7 @@ import { CRMProvider } from "@/context/CRMContext";
 import { Toaster } from "sonner";
 import QueryProvider from "@/providers/queryProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import ServiceWorkerRegistration from "@/helpers/serviceWorker";
 // import { MetaPixel } from "@/components/MetaPixel";
 
 const geistSans = Geist({
@@ -56,6 +57,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <ServiceWorkerRegistration />
         <Toaster />
         <QueryProvider>
           <AuthProvider>

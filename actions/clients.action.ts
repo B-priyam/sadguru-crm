@@ -83,11 +83,12 @@ export const GetClients = async (
     const [fetch, totalClients, totalFilteredClients] = await Promise.all([
       client.client.findMany({
         skip:
-          pathname === "/active-clients" || pathname === "/bookings"
+          pathname === "/active-clients" || pathname === "/bookings" || "/"
             ? 0
             : (currentPage - 1) * pageDataLength,
         ...(pathname !== "/active-clients" &&
-          pathname !== "/bookings" && {
+          pathname !== "/bookings" &&
+          pathname !== "/" && {
             take: pageDataLength,
           }),
         orderBy: {

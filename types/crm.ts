@@ -137,6 +137,19 @@ export interface Template {
   position?: string | null;
 }
 
+export interface Employee {
+  id?: string;
+  name: string;
+  number: string;
+  email: string;
+  role: string;
+  permissions: string[];
+  status: string;
+  createdAt: Date;
+  leads: string;
+  bookings: string;
+}
+
 export type FormFields =
   | "clientName"
   | "number"

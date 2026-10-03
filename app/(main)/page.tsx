@@ -25,7 +25,7 @@ import {
   Cell,
 } from "recharts";
 import { useRouter } from "next/navigation";
-import { isSameMonth } from "date-fns";
+import { isSameDay, isSameMonth } from "date-fns";
 
 const STAGE_COLORS = [
   "hsl(161,94%,30%)",
@@ -41,10 +41,6 @@ const Dashboard: React.FC = () => {
   const { clients, totalClients } = useCRM();
   const router = useRouter();
 
-  const currentMonthClients = clients.map((d) =>
-    isSameMonth(new Date(d.createdAt!), new Date()),
-  );
-
   const stats = useMemo(() => {
     const activeLeads = clients.filter(
       (c) => !["deal_closed", "lost", "booking_confirmed"].includes(c.stage),
@@ -57,7 +53,17 @@ const Dashboard: React.FC = () => {
     const bookingsConfirmed = clients.filter(
       (c) => c.stage === "booking_confirmed",
     ).length;
+    const currentMonthBookingsConfirmed = clients.filter(
+      (c) =>
+        c.stage === "booking_confirmed" &&
+        isSameMonth(new Date(c.createdAt!), new Date()),
+    ).length;
     const dealsClosed = clients.filter((c) => c.stage === "deal_closed");
+    const currentMonthDealsClosed = clients.filter(
+      (c) =>
+        c.stage === "deal_closed" &&
+        isSameMonth(new Date(c.createdAt!), new Date()),
+    );
     const conversionRate =
       Number(totalClients) > 0
         ? Math.round((dealsClosed.length / Number(totalClients)) * 100)
@@ -69,10 +75,17 @@ const Dashboard: React.FC = () => {
       dealsClosed,
       // revenue,
       conversionRate,
-      currentMonthClients,
       currentMonthActiveLeads,
+      currentMonthDealsClosed,
+      currentMonthBookingsConfirmed,
     };
   }, [clients]);
+
+  const currentMonthClients = clients.filter((d) => {
+    // const createdAt = new Date(d.createdAt!.replace(" ", "T"));
+
+    return isSameMonth(new Date(d.createdAt!), new Date());
+  });
 
   const monthlyData = useMemo(() => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
@@ -101,8 +114,12 @@ const Dashboard: React.FC = () => {
         <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           You have{" "}
-          {/* {clients.filter((c) => c.followUp.some((f) => !f.completed)).length}{" "} */}
-          follow-ups pending today.
+          {
+            clients.filter(
+              (c) => c.visit && isSameDay(new Date(c.createdAt!), new Date()),
+            ).length
+          }{" "}
+          visits today.
         </p>
       </div>
 
@@ -129,16 +146,22 @@ const Dashboard: React.FC = () => {
         />
         <KPICard
           label="Bookings"
-          value={stats.bookingsConfirmed}
+          value2={stats.bookingsConfirmed}
           onClick={() => router.push("/bookings")}
           icon={<CalendarCheck size={18} strokeWidth={1.5} />}
+          subtitle="Month"
+          subtitle2="Total"
+          value={stats.currentMonthBookingsConfirmed}
           pointer
         />
         <KPICard
           label="Deals Closed"
-          value={stats.dealsClosed.length}
+          value2={stats.dealsClosed.length}
           onClick={() => router.push("/bookings?activeTabs=deal_closed")}
           icon={<Handshake size={18} strokeWidth={1.5} />}
+          subtitle="Month"
+          subtitle2="Total"
+          value={stats.currentMonthDealsClosed.length}
           pointer
         />
         {/* <KPICard

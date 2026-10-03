@@ -85,3 +85,25 @@ model Template {
   templateText String
   position     String?
 }
+
+model Attendance {
+  id          String @id @default(uuid())
+  userId      String
+  name        String
+  role        String
+  coordinates String
+  date        String
+}
+
+model Employee {
+  id          String   @id @default(uuid())
+  name        String
+  createdAt   DateTime @default(now())
+  number      String
+  email       String
+  role        String
+  permissions String[]
+  status      String
+  leads       String
+  bookings    String
+}

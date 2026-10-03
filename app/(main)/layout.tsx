@@ -14,6 +14,8 @@ import {
   HamburgerIcon,
   MenuIcon,
   LogOutIcon,
+  Group,
+  UserCheck,
 } from "lucide-react";
 import { useTheme } from "@/hooks/use-theme";
 import { Switch } from "@/components/ui/switch";
@@ -26,11 +28,13 @@ import { logoutUser } from "@/helpers/authHelper";
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/pipeline", label: "Pipeline", icon: Kanban },
+  { to: "/attendance", label: "Attendance", icon: UserCheck },
   { to: "/clients", label: "Clients", icon: Users },
   { to: "/properties", label: "Properties", icon: Building2 },
   { to: "/visits", label: "Visits", icon: MapPin },
   { to: "/active-clients", label: "Active Clients", icon: MapPin },
   { to: "/bookings", label: "Bookings", icon: CalendarCheck },
+  { to: "/employee", label: "Team", icon: Users },
   { to: "/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
@@ -40,11 +44,20 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter();
   const isOnline = useOnlineStatus();
   const [showMenu, setShowMenu] = useState(false);
+  const [showOnlineStatus, setshowOnlineStatus] = useState(false);
+  const [isloaded, setIsloaded] = useState(false);
 
   useEffect(() => {
-    if (isOnline) {
-      syncPendingActions();
+    // if (isOnline) {
+    //   syncPendingActions();
+    // }
+    if (!isOnline || isloaded) {
+      setshowOnlineStatus(true);
+      setTimeout(() => {
+        setshowOnlineStatus(false);
+      }, 5000);
     }
+    setIsloaded(true);
   }, [isOnline]);
 
   const handleMenuClick = () => {
@@ -60,6 +73,15 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
+      {showOnlineStatus && (
+        <div
+          className={`flex w-full items-center justify-center fixed ${isOnline ? "bg-green-500" : "bg-red-500"}`}
+        >
+          <p className="text-center text-xs text-white">
+            {isOnline ? "Back Online" : "Connection Lost"}
+          </p>
+        </div>
+      )}
       <div className="min-h-screen bg-background">
         {/* Desktop sidebar */}
         {showMenu && (
